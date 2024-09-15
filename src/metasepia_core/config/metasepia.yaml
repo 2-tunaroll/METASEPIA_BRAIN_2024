@@ -1,0 +1,5 @@
+joy_node:
+  ros__parameters:
+    coalesce_interval_ms: 100  # we want less joy messages (10Hz) cos the serial aint shit
+    deadzone: 0.10        
+    autorepeat_rate: 0.1
