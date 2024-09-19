@@ -452,35 +452,23 @@ void Joy::eventThread()
       }
     }
 
-    // if (!should_publish) {
-    //   // So far, nothing has indicated that we should publish.  However we need to
-    //   // do additional checking since there are several possible reasons:
-    //   // 1.  SDL_WaitEventTimeout failed
-    //   // 2.  SDL_WaitEventTimeout timed out
-    //   // 3.  SDL_WaitEventTimeout succeeded, but the event that happened didn't cause
-    //   //     a publish to happen.
-    //   //
-    //   // If we are autorepeating and enough time has passed, set should_publish.
-    //   rclcpp::Time now = this->now();
-    //   rclcpp::Duration diff_since_last_publish = now - last_publish;
-    //   if ((autorepeat_rate_ > 0.0 &&
-    //     RCL_NS_TO_MS(diff_since_last_publish.nanoseconds()) >= autorepeat_interval_ms_) ||
-    //     publish_soon_)
-    //   {
-    //     last_publish = now;
-    //     should_publish = true;
-    //     publish_soon_ = false;
-    //   }
-    // }
-
-    if(should_publish) {
-      const rclcpp::Time now = this->now();
-      const rclcpp::Duration diff_since_last_publish = now - last_publish;
-      
-      if(RCL_NS_TO_MS(diff_since_last_publish.nanoseconds()) < coalesce_interval_ms_)
-        should_publish = false;
-      else
+    if (!should_publish) {
+      // So far, nothing has indicated that we should publish.  However we need to
+      // do additional checking since there are several possible reasons:
+      // 1.  SDL_WaitEventTimeout failed
+      // 2.  SDL_WaitEventTimeout timed out
+      // 3.  SDL_WaitEventTimeout succeeded, but the event that happened didn't cause
+      //     a publish to happen.
+      //
+      // If we are autorepeating and enough time has passed, set should_publish.
+      rclcpp::Time now = this->now();
+      rclcpp::Duration diff_since_last_publish = now - last_publish;
+      if (autorepeat_rate_ > 0.0 &&
+        RCL_NS_TO_MS(diff_since_last_publish.nanoseconds()) >= autorepeat_interval_ms_)
+      {
         last_publish = now;
+        should_publish = true;
+      }
     }
 
     if (joystick_ != nullptr && should_publish) {
