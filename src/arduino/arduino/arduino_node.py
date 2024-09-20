@@ -5,6 +5,7 @@ from std_msgs.msg import String
 
 import serial
 import numpy as np
+import bisect
 
 MESSAGE_TYPE = 1
 
@@ -33,18 +34,12 @@ class arduino_node(Node):
        12.33, 12.45, 12.6 ]
     
     def voltage_to_battery_charge(self, voltage):
-        i = 0
+        i = bisect.bisect_right(self.vtg, voltage) - 1
         
-        for v in self.vtg:
-            if voltage > v or i == 20:
-                break
-            i = i + 1
-        
-        pct =  self.vtg[i] \
-            + (self.vtg[i+1] - voltage) \
+        return  self.pct[i] \
+            + (voltage - self.vtg[i]) \
             * (self.pct[i+1] - self.pct[i])/(self.vtg[i+1] - self.vtg[i])
         
-        return i
     
     def joy_callback(self, msg):
         # Send instruction over serial
