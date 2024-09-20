@@ -32,6 +32,7 @@
 unsigned long startMillis;
 unsigned long currentMillis;
 const unsigned long period = 25;
+int analogVoltagePin = A0;
 
 input_command inputs;
 
@@ -56,10 +57,14 @@ int8_t sway = 0;
 int8_t pitch = 0;
 int8_t yaw = 0;
 
-uint8_t voltage = 11;
+float voltage = 0.0;
+uint8_t send_voltage = 0;
 
 void loop() {
   currentMillis = millis();
+
+  voltage = (float)analogRead(analogVoltagePin) * (1.0 / 1024.0);
+  send_voltage = (uint8_t)voltage * 256;
   
   if (Serial.available() >= 5) {
 	if (Serial.read() == 1) {
@@ -69,7 +74,7 @@ void loop() {
 		yaw 	= Serial.read() - 128;
 			
 		Serial.write(0b1);
-		Serial.write(voltage);
+		Serial.write(send_voltage);
 		Serial.write(surge);
 		Serial.write(sway);
 		Serial.write(pitch);
