@@ -64,7 +64,7 @@ void loop() {
   currentMillis = millis();
 
   voltage = (float)analogRead(analogVoltagePin) * (1.0 / 1024.0);
-  send_voltage = (uint8_t)voltage * 256;
+  send_voltage = (uint8_t)(voltage * 256);
   
   if (Serial.available() >= 5) {
 	if (Serial.read() == 1) {

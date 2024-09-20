@@ -47,7 +47,7 @@ class arduino_node(Node):
                 data = self.serial_port.read(5)  
 
                 # Extract each byte and interpret as uint8
-                voltage = data[0]
+                voltage = data[0] * 12.6 / 256
                 surge = data[1]
                 sway = data[2]
                 pitch = data[3]
