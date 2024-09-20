@@ -16,7 +16,9 @@ const int SERVOMAX  = 512;// This is the 'maximum' pulse length count (out of 40
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
 // neutral point for each servomotor (estimated at 300 each, refine later)
-const int NEUTRALS[5] = { 300, 300, 300, 300, 300};
+const int NEUTRALS_PORT[5] = { 300, 300, 300, 300, 300};
+const int NEUTRALS_STARBOARD[5] = { 300, 300, 300, 300, 300};
+
 
 // Design constants
 #define NUM_SERVOS 5

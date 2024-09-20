@@ -87,10 +87,10 @@ void loop() {
 
   if (currentMillis - startMillis >= period) {
     // update positions
-    float amp = 10*((float)surge/128.0);
+    float amp = 50*((float)surge/128.0);
 
     if (surge > 0){
-      servo::set_positions(amp, 240, time_milli, FLATWAVE);
+      servo::set_positions(amp, 240, time_milli, SINWAVE);
     }
 
     // increment time for waveform

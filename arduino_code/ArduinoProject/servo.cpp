@@ -47,7 +47,8 @@ void servo::init()
 void servo::set_positions(float amplitude, float wavelength, unsigned long time_milli, int wavetype)
 {
   float angle; 
-  float pulse;  
+  float pulse_port;
+  float pulse_starboard;  
   float height;
 
   uint8_t servonum;
@@ -74,10 +75,12 @@ void servo::set_positions(float amplitude, float wavelength, unsigned long time_
       break;
     }
     
-    pulse = map(angle, -90, 90, SERVOMIN, SERVOMAX);
+    pulse_port = map(angle, -90, 90, SERVOMIN, SERVOMAX); 
+    pulse_starboard = map(-angle, -90, 90, SERVOMIN, SERVOMAX);
 
 
-    pwm.setPWM(servonum, 0, pulse);
+    pwm.setPWM(servonum, 0, pulse_port);
+    pwm.setPWM(servonum + NUM_SERVOS, 0, pulse_starboard);
     //Serial.println(pulse);
   }
 }
@@ -90,6 +93,7 @@ void servo::set_neutrals()
   //loop through all servos and set to neutral point
   for(servonum = 0; servonum < NUM_SERVOS; servonum++)
   {
-    pwm.setPWM(servonum,0,NEUTRALS[servonum]);
+    pwm.setPWM(servonum,0,NEUTRALS_PORT[servonum]);
+    pwm.setPWM(servonum + NUM_SERVOS,0,NEUTRALS_STARBOARD[servonum]);
   }
 }
