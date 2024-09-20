@@ -26,6 +26,25 @@ class arduino_node(Node):
                                 baudrate = 115200,
                                 timeout = 1
                             )
+        self.pct = [  0,   5,  10,  15,  20,  25,  30,  35,  40,  45,  50,  55,  60,
+        65,  70,  75,  80,  85,  90,  95, 100]
+        self.vtg = [ 9.82, 10.83, 11.06, 11.12, 11.18, 11.24, 11.3 , 11.36, 11.39,
+       11.45, 11.51, 11.56, 11.62, 11.74, 11.86, 11.95, 12.07, 12.25,
+       12.33, 12.45, 12.6 ]
+    
+    def voltage_to_battery_charge(self, voltage):
+        i = 0
+        
+        for v in self.vtg:
+            if voltage > v or i == 20:
+                break
+            i = i + 1
+        
+        pct =  self.vtg[i] \
+            + (self.vtg[i+1] - voltage) \
+            * (self.pct[i+1] - self.pct[i])/(self.vtg[i+1] - self.vtg[i])
+        
+        return i
     
     def joy_callback(self, msg):
         # Send instruction over serial
@@ -52,9 +71,11 @@ class arduino_node(Node):
                 sway = data[2]
                 pitch = data[3]
                 yaw = data[4]
+
+                charge = self.voltage_to_battery_charge(voltage)
             
                 msg = String()
-                msg.data = f"Voltage: {voltage}, Surge: {surge}, Sway: {sway}, Pitch: {pitch}, Yaw: {yaw}"
+                msg.data = f"Voltage: {voltage}, Charge: {charge}, Surge: {surge}, Sway: {sway}, Pitch: {pitch}, Yaw: {yaw}"
                 self.publisher.publish(msg)
 
 

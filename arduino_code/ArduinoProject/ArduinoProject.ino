@@ -63,7 +63,7 @@ uint8_t send_voltage = 0;
 void loop() {
   currentMillis = millis();
 
-  voltage = (float)analogRead(analogVoltagePin) * (1.0 / 1024.0);
+  voltage = (float)analogRead(analogVoltagePin) * (1.0 / 1024.0) * (1.0 - 0.008);
   send_voltage = (uint8_t)(voltage * 256);
   
   if (Serial.available() >= 5) {
@@ -87,7 +87,7 @@ void loop() {
 
   if (currentMillis - startMillis >= period) {
     // update positions
-    float amp = 50*((float)surge/128.0);
+    float amp = 10*((float)surge/128.0);
 
     if (surge > 0){
       servo::set_positions(amp, 240, time_milli, FLATWAVE);
