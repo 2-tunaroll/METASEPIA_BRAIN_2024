@@ -13,7 +13,7 @@ def generate_launch_description():
     )
 
     camera_node = Node(
-        package='realsense2_camera', executable='rs_launch.py', name='camera_node',
+        package='realsense2_camera', executable='realsense2_camera_node', name='camera_node',
         parameters=[params],
     )
 
