@@ -1,20 +1,23 @@
-from launch import LaunchDescription
-from launch_ros.actions import Node
-
 import os
 from ament_index_python.packages import get_package_share_directory
 
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+
 def generate_launch_description():
 
-    params = os.path.join(
-        get_package_share_directory('metasepia_core'),
-        'config',
-        'metasepia.yaml'
-    )
-
-    camera_node = Node(
-        package='realsense2_camera', executable='realsense2_camera_node', name='camera_node',
-        parameters=[params],
+    camera_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(
+                get_package_share_directory("realsense2_camera"),
+                "launch",
+                "rs_launch.py"
+            )
+        ]),
+        launch_arguments={
+            'enable_depth' : "false"
+        }.items()
     )
 
     return LaunchDescription([
