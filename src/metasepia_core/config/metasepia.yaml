@@ -3,3 +3,34 @@ joy_node:
     coalesce_interval_ms: 100  # we want less joy messages (10Hz) cos the serial aint shit
     deadzone: 0.10        
     autorepeat_rate: 10.0
+
+camera_node:
+  ros__parameters:
+      serial_no: '' 
+      initial_reset: true
+      base_frame_id: camera
+
+      align_depth: false
+      enable_pointcloud: false
+      enable_fisheye: false
+      enable_fisheye1: false
+      enable_fisheye2: false
+      enable_pose: false
+
+      enable_color: true
+      color_fps: 30.0
+      color_height: 480
+      color_width: 640
+          
+      enable_depth: false
+      depth_fps: 30.0
+      depth_height: 720
+      depth_width: 1280
+
+      enable_infra: false
+      enable_infra1: false
+      enable_infra2: false
+
+      enable_gyro: true
+
+      enable_accel: true
