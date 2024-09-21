@@ -34,6 +34,12 @@ class arduino_node(Node):
        12.33, 12.45, 12.6 ]
     
     def voltage_to_battery_charge(self, voltage):
+        if voltage < 9.8:
+            return -1
+        
+        if voltage == 12.6:
+            return 100
+        
         i = bisect.bisect_right(self.vtg, voltage) - 1
         
         return  self.pct[i] \
@@ -53,24 +59,19 @@ class arduino_node(Node):
         self.serial_port.write(message)
 
         # Recieve response and update voltage topic
-        if self.serial_port.in_waiting >= 6:
+        if self.serial_port.in_waiting >= 3:
             status = self.serial_port.read()
             status_val = int.from_bytes(status, byteorder='big')
 
             if status_val == 0b1:
-                data = self.serial_port.read(5)  
+                v_high_byte = ord(self.serial_port.read())
+                v_low_byte  = ord(self.serial_port.read())
 
-                # Extract each byte and interpret as uint8
-                voltage = data[0] * 12.6 / 256
-                surge = data[1]
-                sway = data[2]
-                pitch = data[3]
-                yaw = data[4]
-
+                voltage = (v_high_byte << 8 | v_low_byte) * (12.6 / 1023) # recombine voltage and rescale for 12.6 max voltage
                 charge = self.voltage_to_battery_charge(voltage)
             
                 msg = String()
-                msg.data = f"Voltage: {voltage}, Charge: {charge}, Surge: {surge}, Sway: {sway}, Pitch: {pitch}, Yaw: {yaw}"
+                msg.data = f"Voltage: {voltage}, Charge: {charge}"
                 self.publisher.publish(msg)
 
 

@@ -57,32 +57,31 @@ int8_t sway = 0;
 int8_t pitch = 0;
 int8_t yaw = 0;
 
-float voltage = 0.0;
-uint8_t send_voltage = 0;
+int voltage = 0;
+byte voltage_low;
+byte voltage_high;
+// uint8_t send_voltage = 0;
 
 void loop() {
   currentMillis = millis();
 
-  voltage = (float)analogRead(analogVoltagePin) * (1.0 / 1024.0) * (1.0 - 0.008);
-  send_voltage = (uint8_t)(voltage * 256);
+  voltage = analogRead(analogVoltagePin);
+  voltage_high  = voltage >> 8;     // Extract the high byte (the upper 2 bits)
+  voltage_low   = voltage & 0xFF;   // Extract the low byte (the lower 8 bits)
   
   if (Serial.available() >= 5) {
-	if (Serial.read() == 1) {
-		surge 	= Serial.read() - 128;
-		sway 	= Serial.read() - 128;
-		pitch 	= Serial.read() - 128;
-		yaw 	= Serial.read() - 128;
-			
-		Serial.write(0b1);
-		Serial.write(send_voltage);
-		Serial.write(surge);
-		Serial.write(sway);
-		Serial.write(pitch);
-		Serial.write(yaw);
-}
-	else {
-		Serial.println("dog");
-	}
+    if (Serial.read() == 1) {
+      surge 	= Serial.read() - 128;
+      sway 	  = Serial.read() - 128;
+      pitch 	= Serial.read() - 128;
+      yaw 	  = Serial.read() - 128;
+        
+      Serial.write(0b1);
+      Serial.write(voltage_high);
+      Serial.write(voltage_low);
+    } else {
+      Serial.println("dog");
+    }
   }
 
   if (currentMillis - startMillis >= period) {
