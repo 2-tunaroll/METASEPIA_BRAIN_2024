@@ -2,5 +2,5 @@
 
 
 
-> blib blub blibbity bloop\
-> ~ <cite>Mr. Cuttlefish<cite>
+> blib blub blibbity bloop \
+> ~ Mr. Cuttlefish
