@@ -14,7 +14,7 @@ setup(
         (os.path.join('share', package_name, 'launch'),
          glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
         (os.path.join('share', package_name, 'config'),
-         glob(os.path.join('config', '*.yaml')))
+         glob(os.path.join('config', '*.json')) + glob(os.path.join('config', '*.yaml')))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -24,9 +24,5 @@ setup(
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': [
-            'arduino_node = arduino.arduino_node:main',
-            'joy_node = joy.joy_node:main'
-        ],
     },
 )
