@@ -40,16 +40,18 @@ void servo::init()
   pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
 
   // drive to a neutral position
-  servo::set_neutrals();
+  servo::set_neutrals(B);
 }
 
 // set servo positions based off angle required
-void servo::set_positions(float amplitude, float wavelength, unsigned long time_milli, int wavetype)
+void servo::set_positions(float amplitude, float wavelength, unsigned long time_milli, int wavetype, int side)
 {
   float angle; 
   float pulse_port;
   float pulse_starboard;  
   float height;
+  float port_angle;
+  float starboard_angle;
 
   uint8_t servonum;
   
@@ -75,9 +77,26 @@ void servo::set_positions(float amplitude, float wavelength, unsigned long time_
       break;
     }
     
-    pulse_port = map(angle, -90, 90, SERVOMIN, SERVOMAX); 
-    pulse_starboard = map(-angle, -90, 90, SERVOMIN, SERVOMAX);
+    switch(side)
+    {
+      case P:
+      port_angle = angle;
+      starboard_angle = 0;
+      break;
 
+      case S:
+      port_angle = 0;
+      starboard_angle = -angle;
+      break;
+
+      case B:
+      port_angle = angle;
+      starboard_angle = -angle;
+      break;
+    }
+
+    pulse_port = map(port_angle, -90, 90, SERVOMIN, SERVOMAX); 
+    pulse_starboard = map(starboard_angle, -90, 90, SERVOMIN, SERVOMAX);
 
     pwm.setPWM(servonum, 0, pulse_port);
     pwm.setPWM(servonum + NUM_SERVOS, 0, pulse_starboard);
@@ -86,14 +105,27 @@ void servo::set_positions(float amplitude, float wavelength, unsigned long time_
 }
 
 // set all servomotors to a neutral position
-void servo::set_neutrals()
+void servo::set_neutrals(int side)
 {
   uint8_t servonum;
 
   //loop through all servos and set to neutral point
   for(servonum = 0; servonum < NUM_SERVOS; servonum++)
   {
-    pwm.setPWM(servonum,0,NEUTRALS_PORT[servonum]);
-    pwm.setPWM(servonum + NUM_SERVOS,0,NEUTRALS_STARBOARD[servonum]);
+    switch (side)
+    {
+      case P:
+      pwm.setPWM(servonum,0,NEUTRALS_PORT[servonum]);
+      break;
+
+      case S:
+      pwm.setPWM(servonum + NUM_SERVOS,0,NEUTRALS_STARBOARD[servonum]);
+      break;
+
+      case B:
+      pwm.setPWM(servonum,0,NEUTRALS_PORT[servonum]);
+      pwm.setPWM(servonum + NUM_SERVOS,0,NEUTRALS_STARBOARD[servonum]);
+      break;
+    }
   }
 }

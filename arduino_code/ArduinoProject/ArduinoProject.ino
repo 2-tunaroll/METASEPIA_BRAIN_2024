@@ -61,6 +61,7 @@ int voltage = 0;
 byte voltage_low;
 byte voltage_high;
 // uint8_t send_voltage = 0;
+float amp = 0;
 
 void loop() {
   currentMillis = millis();
@@ -86,10 +87,22 @@ void loop() {
 
   if (currentMillis - startMillis >= period) {
     // update positions
-    float amp = 50*((float)surge/128.0);
 
-    if (surge > 0){
-      servo::set_positions(amp, 240, time_milli, SINWAVE);
+    amp = 50;
+    if (abs(surge) > abs(sway))
+    {
+      servo::set_positions(amp, 240, time_milli, SINWAVE, B);
+    } 
+    else 
+    {
+      if (sway > 0)
+      {
+        servo::set_positions(amp, 240, time_milli, FLATWAVE, P);
+      }
+      else if (sway < 0)
+      {
+        servo::set_positions(amp, 240, time_milli, FLATWAVE, S);
+      }
     }
 
     // increment time for waveform

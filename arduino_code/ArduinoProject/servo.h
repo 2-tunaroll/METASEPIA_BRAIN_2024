@@ -11,8 +11,8 @@
 namespace servo 
 {
   void init();
-  void set_positions(float amplitude, float wavelength, unsigned long time_milli, int wavetype);
-  void set_neutrals();
+  void set_positions(float amplitude, float wavelength, unsigned long time_milli, int wavetype, int side);
+  void set_neutrals(int side);
 }
 
 #endif // SERVO_H
