@@ -23,8 +23,6 @@ const cmd_sub = new ROSLIB.Topic({
   messageType: "custom_msgs/CMD"
 })
 
-
-
 export default {
   name: 'App',
   components: {
