@@ -28,6 +28,16 @@ def generate_launch_description():
         ])
     )
 
+    controller_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(
+                get_package_share_directory('metasepia_core'),
+                'launch',
+                'controller_launch.py'
+            )
+        ])
+    )
+
     camera_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             os.path.join(
@@ -53,5 +63,6 @@ def generate_launch_description():
         arduino_node,
         joy_node,
         camera_node,
-        rosbridge_node
+        rosbridge_node,
+        controller_node
     ])

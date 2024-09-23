@@ -1,7 +1,8 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
-from std_msgs.msg import String
+
+from custom_msgs.msg import CMD, BatteryState
 
 import serial
 import numpy as np
@@ -20,8 +21,8 @@ def float_to_uint8(value, min_value=-1.0, max_value=1.0):
 class arduino_node(Node):
     def __init__(self):
         super().__init__('arduino_node')
-        self.subscription = self.create_subscription(Joy, 'joy', self.joy_callback, 10)
-        self.publisher = self.create_publisher(String, 'test', 10)
+        self.subscription = self.create_subscription(CMD, 'CMD', self.cmd_callback, 10)
+        self.publisher = self.create_publisher(BatteryState, 'BatteryState', 10)
         self.serial_port = serial.Serial(
                                 port = '/dev/ttyACM0',
                                 baudrate = 115200,
@@ -47,14 +48,14 @@ class arduino_node(Node):
             * (self.pct[i+1] - self.pct[i])/(self.vtg[i+1] - self.vtg[i])
         
     
-    def joy_callback(self, msg):
+    def cmd_callback(self, msg):
         # Send instruction over serial
         message = (
             MESSAGE_TYPE,                   # type = instruction
-            float_to_uint8(msg.axes[1]),    # surge
-            float_to_uint8(msg.axes[0]),    # sway
-            float_to_uint8(msg.axes[4]),    # pitch
-            float_to_uint8(msg.axes[3])     # yaw
+            float_to_uint8(msg.surge),    
+            float_to_uint8(msg.sway),    
+            float_to_uint8(msg.pitch),    
+            float_to_uint8(msg.yaw)     
         )
         self.serial_port.write(message)
 
@@ -68,10 +69,10 @@ class arduino_node(Node):
                 v_low_byte  = ord(self.serial_port.read())
 
                 voltage = (v_high_byte << 8 | v_low_byte) * (12.6 / 1023) # recombine voltage and rescale for 12.6 max voltage
-                charge = self.voltage_to_battery_charge(voltage)
             
-                msg = String()
-                msg.data = f"Voltage: {voltage}, Charge: {charge}"
+                msg = BatteryState()
+                msg.voltage = voltage
+                msg.charge = self.voltage_to_battery_charge(voltage)
                 self.publisher.publish(msg)
 
 

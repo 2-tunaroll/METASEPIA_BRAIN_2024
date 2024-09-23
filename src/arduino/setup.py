@@ -22,7 +22,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'arduino_node = arduino.arduino_node:main'
+            'arduino_node = arduino.arduino_node:main',
+            'controller_node = arduino.controller_node:main'
         ],
     },
 )

@@ -1,8 +1,15 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <p>sub msg: {{ msg }} </p> <!-- 追加 -->
+  <head> 
+    <Title> Metasepia Dashboard </Title>
+  </head>
+
   <div>
-    <img v-bind:src="'data:image/jpeg;base64,'+imageBytes" /> 
+    <p>voltage : {{ voltage }} </p> <!-- 追加 -->
+    <p>charge : {{ charge }} </p>
+    <div>
+      <img v-bind:src="'data:image/jpeg;base64,'+ imageBytes1 " /> 
+    </div>
+    <p>surge : {{ surge }} sway : {{ sway }} pitch : {{ pitch }} yaw : {{ yaw }}</p>
   </div>
 </template>
 
@@ -13,43 +20,47 @@ const ros = new ROSLIB.Ros({
   url: "ws://localhost:9090" 
 });
 
-const sub_test = new ROSLIB.Topic({
+const battery_sub = new ROSLIB.Topic({
   ros: ros,
-  name: "/test",
-  messageType: "std_msgs/String"
+  name: "/BatteryState",
+  messageType: "custom_msgs/BatteryState"
 });
 
-const camera_subscription = new ROSLIB.Topic({
+const camera_sub = new ROSLIB.Topic({
   ros: ros,
   name: "/camera/camera/color/image_raw/compressed",
   messageType: "sensor_msgs/msg/CompressedImage"
 })
 
-// const camera_subscription = new ROSLIB.Topic({
-//   ros: ros,
-//   name: "/camera/camera/depth/image_rect_raw/compressed",
-//   messageType: "sensor_msgs/msg/CompressedImage"
-// })
+const cmd_sub = new ROSLIB.Topic({
+  ros: ros,
+  name: "/CMD",
+  messageType: "custom_msgs/CMD"
+})
+
 
 
 export default {
   name: 'App',
   components: {
   },
-  // *** 追加 ここから *** //
   data: function () {
     return {
-      msg: "",
+        imageBytes1: "",
+        imageBytes2: "",
+        voltage: 0,
+        charge: 0,
+        surge: 0,
+        sway: 0,
+        pitch: 0,
+        yaw: 0
     };
   },
-  // *** 追加 ここまで *** //
   mounted() {
     this.init();
   },
   methods: {
     init: function () {
-      
-      console.log("test");
       ros.on("connection", function() {
         console.log("connected to websocket server.");
       });
@@ -62,14 +73,25 @@ export default {
 
       var self = this;
 
-      sub_test.subscribe((message) => {
-        console.log('Received message on ' + sub_test.name + ': ' + message.data);
-        self.msg = message.data;
+      battery_sub.subscribe((message) => {
+        console.log('Received message on ' + battery_sub.name + ': ' + message.voltage + ': ' + message.charge);
+        self.voltage = message.voltage;
+        self.charge = message.charge;
       });
 
-      camera_subscription.subscribe((message) => {
-        self.imageBytes = message.data;
+      camera_sub.subscribe((message) => {
+        console.log('Received message on ' + camera_sub.name);
+        self.imageBytes1 = message.data;
       });
+
+      cmd_sub.subscribe((message) => {
+        console.log('Received message on ' + cmd_sub.name + ': ' + message.surge + ': ' + message.sway + ': ' + message.pitch + ': ' + message.yaw);
+        self.surge = message.surge;
+        self.sway = message.sway;
+        self.pitch = message.pitch;
+        self.yaw = message.yaw;
+      });
+
     },
   }
 }
@@ -81,7 +103,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #FF7C0A;
+  background-color: #272727;
   margin-top: 60px;
 }
 </style>

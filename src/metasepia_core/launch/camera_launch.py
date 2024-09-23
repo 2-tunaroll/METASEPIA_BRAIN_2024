@@ -23,9 +23,13 @@ def generate_launch_description():
         ]),
         launch_arguments={
             'enable_infra' : "false",
-            'enable_depth' : "false",
+            'enable_depth' : "true",
+            'depth_module.depth_profile' : "256x144x90",
             'enable_color' : "true",
-            'rgb_camera.color_profile' : "424x240x15"
+            'rgb_camera.color_profile' : "424x240x15",
+            '.camera.color.image_raw.compressed.jpeg_quality' : "35",
+            '.camera.depth.image_rect_raw.compressed.jpeg_quality' : "35",
+            # 'pointcloud.enable' : "true"
         }.items()
     )
 

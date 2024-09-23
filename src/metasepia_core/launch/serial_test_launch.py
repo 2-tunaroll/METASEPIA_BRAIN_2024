@@ -18,6 +18,16 @@ def generate_launch_description():
         ])
     )
 
+    controller_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(
+                get_package_share_directory('metasepia_core'),
+                'launch',
+                'controller_launch.py'
+            )
+        ])
+    )
+
     joy_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             os.path.join(
@@ -29,6 +39,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        controller_node,
         arduino_node,
         joy_node
     ])
