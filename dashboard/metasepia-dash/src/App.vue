@@ -1,18 +1,3 @@
-<template>
-  <head> 
-    <Title> Metasepia Dashboard </Title>
-  </head>
-
-  <div>
-    <p>voltage : {{ voltage }} </p> <!-- 追加 -->
-    <p>charge : {{ charge }} </p>
-    <div>
-      <img v-bind:src="'data:image/jpeg;base64,'+ imageBytes1 " /> 
-    </div>
-    <p>surge : {{ surge }} sway : {{ sway }} pitch : {{ pitch }} yaw : {{ yaw }}</p>
-  </div>
-</template>
-
 <script>
 import ROSLIB from "roslib"
 
@@ -97,14 +82,13 @@ export default {
 }
 </script>
 
-<style>
-#app {
-  font-family: Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #FF7C0A;
-  background-color: #272727;
-  margin-top: 60px;
-}
-</style>
+<template>
+  <div class="flex min-h-screen w-full bg-gray-700 font-sans">
+    <p>voltage : {{ voltage }} </p> <!-- 追加 -->
+    <p>charge : {{ charge }} </p>
+    <div>
+      <img v-bind:src="'data:image/jpeg;base64,'+ imageBytes1 " /> 
+    </div>
+    <p>surge : {{ surge }} sway : {{ sway }} pitch : {{ pitch }} yaw : {{ yaw }}</p>
+  </div>
+</template>
