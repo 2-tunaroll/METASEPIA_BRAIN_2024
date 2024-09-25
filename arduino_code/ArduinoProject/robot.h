@@ -19,11 +19,13 @@ const int SERVOMAX  = 512;// This is the 'maximum' pulse length count (out of 40
 const int NEUTRALS_PORT[5] = { 300, 300, 300, 300, 300};
 const int NEUTRALS_STARBOARD[5] = { 300, 300, 300, 300, 300};
 
-
 // Design constants
 #define NUM_SERVOS 5
 #define SPOKE_LENGTH_MM 140
 #define FIN_LENGTH_MM 240
+
+// Programming constants
+#define MAX_TIME_INC 7
 
 // Coding constants
 enum Wavetypes {SINWAVE, FLATWAVE, STANDINGWAVE, SINANDFLAT};

@@ -8,11 +8,22 @@
 #ifndef SERVO_H
 #define SERVO_H
 
+#include "robot.h"
+
+typedef struct {
+  float port;
+  float starboard;
+} time_milli_t;
+
 namespace servo 
 {
   void init();
   void set_positions(float amplitude, float wavelength, float time_milli, int wavetype, int side);
   void set_neutrals(int side);
+  time_milli_t drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time_milli);
+  float clamp(float time_inc);
 }
+
+
 
 #endif // SERVO_H

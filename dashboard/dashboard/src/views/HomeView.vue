@@ -1,57 +1,42 @@
 <template>
-    <v-container>
-      <!-- video stream -->
-      <v-row >
-        <v-col>
-          <v-container>
-            <img v-bind:src="'data:image/jpeg;base64,' + imageBytes1"
-            width="700"
-            cover
-            />
-          </v-container>
-        </v-col>
-
-        <v-col>
-          <v-card>
-            <v-container>
-              <p>Voltage : {{ Math.round(voltage * 100) / 100 }}</p>
-              <p>Charge  : {{ Math.floor(charge) }}%</p>
-              <v-progress-linear 
-                v-model="charge"
-                color="primary"
-              ></v-progress-linear>
-            </v-container>
+    <v-container>    
+    <v-row no-gutters>
+      <v-col>
+        <img v-bind:src="'data:image/jpeg;base64,' + imageBytes1"
+        width="700"
+        height="500"
+        cover
+        />
+      </v-col> 
+      <v-col>
+        <v-row no-gutters>
+          <v-card
+            width = "400"
+            height = "150"
+          >
+            Voltage : {{ Math.round(average_voltage * 100) / 100 }}
+            Charge  : {{ Math.floor(average_charge) }}%
+            <v-progress-linear 
+              v-model="average_charge"
+              color="primary"
+            ></v-progress-linear>
           </v-card>
-          
-          <v-card>
-            <v-container>
-              <p>surge : {{Math.round(surge * 100) / 100}}</p>
-              <v-progress-linear 
-                model-value="100"
-              ></v-progress-linear>
-            </v-container>
-            <v-container>
-              <p>sway : {{Math.round(sway * 100) / 100}}</p>
-              <v-progress-linear 
-                model-value="100"
-              ></v-progress-linear>
-            </v-container>
-            <v-container>
-              <p>pitch : {{ Math.round(pitch * 100) / 100 }}</p>
-              <v-progress-linear 
-                model-value="100"
-              ></v-progress-linear>
-            </v-container>
-            <v-container>
-              <p>yaw : {{ Math.round(yaw * 100) / 100 }}</p>
-              <v-progress-linear 
-                model-value="100"
-              ></v-progress-linear>
-            </v-container>
+        </v-row>
+        <v-row no-gutters>
+          <v-card
+            width = "400"
+          >
+            <pre>
+              surge   : {{Math.round(surge * 100) / 100}} 
+              sway    : {{Math.round(sway * 100) / 100}}
+              pitch   : {{ Math.round(pitch * 100) / 100 }}
+              yaw     : {{ Math.round(yaw * 100) / 100 }}
+            </pre>
           </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+        </v-row>
+      </v-col>
+    </v-row>  
+  </v-container>
 </template>
 
 <script>
@@ -85,13 +70,17 @@ export default {
   },
   data: function () {
     return {
-        imageBytes1: "",
-        voltage: 0,
-        charge: 0,
-        surge: 0,
-        sway: 0,
-        pitch: 0,
-        yaw: 0
+      imageBytes1: "",
+      voltage: 0,
+      voltage_window: [],
+      average_voltage: 0,
+      charge: 0,
+      charge_window: [],
+      average_charge: 0,
+      surge: 0,
+      sway: 0,
+      pitch: 0,
+      yaw: 0
     };
   },
   mounted() {
@@ -114,7 +103,10 @@ export default {
       battery_sub.subscribe((message) => {
         console.log('Received message on ' + battery_sub.name + ': ' + message.voltage + ': ' + message.charge);
         self.voltage = message.voltage;
+        self.add_voltage(message.voltage);
+
         self.charge = message.charge;
+        self.add_charge(message.charge);
       });
 
       camera_sub.subscribe((message) => {
@@ -131,6 +123,30 @@ export default {
       });
 
     },
+    add_voltage(volatge) {
+      if (this.voltage_window.length >= 50) {
+        this.voltage_window.shift();
+      }
+      this.voltage_window.push(volatge);
+      this.calculate_average_voltage();
+    },
+    calculate_average_voltage() {
+      if (this.voltage_window.length > 0) {
+        this.average_voltage = this.voltage_window.reduce((partialSum, a) => partialSum + a, 0) / this.voltage_window.length;
+      }
+    },
+    add_charge(charge) {
+      if (this.charge_window.length >= 100) {
+        this.charge_window.shift();
+      }
+      this.charge_window.push(charge);
+      this.calculate_average_charge();
+    },
+    calculate_average_charge() {
+      if (this.charge_window.length > 0) {
+        this.average_charge = this.charge_window.reduce((partialSum, a) => partialSum + a, 0) / this.charge_window.length;
+      }
+    }
   }
 }
 </script>

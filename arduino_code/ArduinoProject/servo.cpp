@@ -82,26 +82,23 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
     switch(side)
     {
       case P:
-      port_angle = angle;
-      starboard_angle = 0;
+      pulse_port = map(angle, -90, 90, SERVOMIN, SERVOMAX); 
+      pwm.setPWM(servonum, 0, pulse_port);
       break;
 
       case S:
-      port_angle = 0;
-      starboard_angle = -angle;
+      pulse_starboard = map(-angle, -90, 90, SERVOMIN, SERVOMAX);
+      pwm.setPWM(servonum + NUM_SERVOS, 0, pulse_starboard);
       break;
 
       case B:
-      port_angle = angle;
-      starboard_angle = -angle;
+      pulse_port = map(angle, -90, 90, SERVOMIN, SERVOMAX); 
+      pulse_starboard = map(-angle, -90, 90, SERVOMIN, SERVOMAX);
+      pwm.setPWM(servonum, 0, pulse_port);
+      pwm.setPWM(servonum + NUM_SERVOS, 0, pulse_starboard);
       break;
     }
 
-    pulse_port = map(port_angle, -90, 90, SERVOMIN, SERVOMAX); 
-    pulse_starboard = map(starboard_angle, -90, 90, SERVOMIN, SERVOMAX);
-
-    pwm.setPWM(servonum, 0, pulse_port);
-    pwm.setPWM(servonum + NUM_SERVOS, 0, pulse_starboard);
     //Serial.println(pulse);
   }
 }
@@ -131,3 +128,35 @@ void servo::set_neutrals(int side)
     }
   }
 }
+
+time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time){
+  
+  // set positions
+  servo::set_positions(amp, 240, time.port, SINWAVE, P);
+  servo::set_positions(amp, 240, time.starboard, SINWAVE, S);
+
+  // calculate incrementors (for now just max)
+  float time_inc_P = MAX_TIME_INC;
+  float time_inc_S = MAX_TIME_INC;
+
+  // clamp both incrementors to within max and min
+  //time_inc_P = clamp(time_inc_P);
+  //time_inc_S = clamp(time_inc_S);
+
+  // increment both times 
+  time.port += time_inc_P;
+  time.starboard += time_inc_S;  
+
+  // return tuple of times
+  return time;
+}
+
+float servo::clamp(float time_inc){
+  if (time_inc > MAX_TIME_INC){
+    time_inc = MAX_TIME_INC;
+  } else if (time_inc < -MAX_TIME_INC){
+    time_inc = -MAX_TIME_INC;
+  }
+  return time_inc;
+}
+

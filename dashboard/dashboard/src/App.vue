@@ -1,8 +1,8 @@
 <template>
-  <v-app dark>
-    <v-main>
+  <v-app class="darkTheme">
+    <v-content>
       <router-view/>
-    </v-main>
+    </v-content>
   </v-app>
 </template>
 
@@ -15,3 +15,4 @@
     }),
   };
 </script>
+

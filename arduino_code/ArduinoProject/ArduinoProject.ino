@@ -14,6 +14,7 @@
 // hardware includes
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
+#include "microTuple.h"
 
 // module includes
 #include "robot.h"
@@ -36,6 +37,8 @@ int analogVoltagePin = A0;
 
 input_command inputs;
 
+time_milli_t time_milli;
+
 // setup function - baud rate, serial printing, initialising
 void setup() {
   Serial.begin(115200);
@@ -44,11 +47,13 @@ void setup() {
   startMillis = millis();
   servo::init();
 
+  time_milli.port = 0;
+  time_milli.starboard = 0;
+
   delay(2000);
 }
 
 //main loop + variables
-float time_milli = 0;
 String message = "test";
 bool status = true;
 
@@ -89,28 +94,36 @@ void loop() {
   }
 
   if (currentMillis - startMillis >= period) {
+    // ----------------------- OLD CODE ----------------------------
+    // // amp = 50;
+    // // update positions
+    // // drive_fins(surge, sway, pitch, yaw, amp);
+    // // Surge OR sway - rudimentry
     // amp = 50;
-    // update positions
-    // drive_fins(surge, sway, pitch, yaw, amp);
+    // if (abs(surge) > abs(sway)) {
+    //   servo::set_positions(amp, 240, time_milli, SINWAVE, B);
+    // } 
+    // else if (sway > 0) {
+    //     servo::set_positions(amp, 480, time_milli, STANDINGWAVE, P);
+    //   }
+    // else if (sway < 0) {
+    //   servo::set_positions(amp, 480, time_milli, STANDINGWAVE, S);
+    // } 
+    // else {
+    //   // reset time if no input
+    //   time_milli = 0;
+    // }
+    // // increment time for waveform
+    // time_milli += 7;
+    // startMillis = currentMillis;
 
-    // Surge OR sway - rudimentry
+
+    // ------------------ NEW CODE ------------------------------
     amp = 50;
-    if (abs(surge) > abs(sway)) {
-      servo::set_positions(amp, 240, time_milli, SINWAVE, B);
-    } 
-    else if (sway > 0) {
-        servo::set_positions(amp, 480, time_milli, STANDINGWAVE, P);
-      }
-    else if (sway < 0) {
-      servo::set_positions(amp, 480, time_milli, STANDINGWAVE, S);
-    } 
-    else {
-      // reset time if no input
-      time_milli = 0;
+    if (surge > 0){
+      time_milli = servo::drive_fins(surge, sway, pitch, yaw, amp, time_milli);
     }
 
-    // increment time for waveform
-    time_milli += 7;
     startMillis = currentMillis;
   }
 }
