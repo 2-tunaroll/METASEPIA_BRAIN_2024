@@ -48,7 +48,7 @@ void setup() {
 }
 
 //main loop + variables
-unsigned long time_milli = 0;
+float time_milli = 0;
 String message = "test";
 bool status = true;
 
@@ -95,24 +95,22 @@ void loop() {
 
     // Surge OR sway - rudimentry
     amp = 50;
-    if (abs(surge) > abs(sway))
-    {
+    if (abs(surge) > abs(sway)) {
       servo::set_positions(amp, 240, time_milli, SINWAVE, B);
     } 
-    else 
-    {
-      if (sway > 0)
-      {
-        servo::set_positions(amp, 240, time_milli, FLATWAVE, P);
+    else if (sway > 0) {
+        servo::set_positions(amp, 480, time_milli, STANDINGWAVE, P);
       }
-      else if (sway < 0)
-      {
-        servo::set_positions(amp, 240, time_milli, FLATWAVE, S);
-      }
+    else if (sway < 0) {
+      servo::set_positions(amp, 480, time_milli, STANDINGWAVE, S);
+    } 
+    else {
+      // reset time if no input
+      time_milli = 0;
     }
 
     // increment time for waveform
-    time_milli += 5;
+    time_milli += 7;
     startMillis = currentMillis;
   }
 }

@@ -27,8 +27,8 @@ def generate_launch_description():
             'depth_module.depth_profile' : "256x144x90",
             'enable_color' : "true",
             'rgb_camera.color_profile' : "424x240x15",
-            '.camera.color.image_raw.compressed.jpeg_quality' : "35",
-            '.camera.depth.image_rect_raw.compressed.jpeg_quality' : "35",
+            '/camera/color/image_raw/compressed/format' : "jpeg",  # Converted XML param
+            '/camera/color/image_raw/compressed/jpeg_quality' : "23",  # Converted XML param
             # 'pointcloud.enable' : "true"
         }.items()
     )

@@ -44,7 +44,7 @@ void servo::init()
 }
 
 // set servo positions based off angle required
-void servo::set_positions(float amplitude, float wavelength, unsigned long time_milli, int wavetype, int side)
+void servo::set_positions(float amplitude, float wavelength, float time_milli, int wavetype, int side)
 {
   float angle; 
   float pulse_port;
@@ -69,9 +69,11 @@ void servo::set_positions(float amplitude, float wavelength, unsigned long time_
 
       case STANDINGWAVE:
       angle = waveform::calc_angle_standingwave(amplitude, wavelength, time_milli, servonum);
+      break;
 
       case SINANDFLAT:
       angle = waveform::calc_angle_sinandflat(amplitude, wavelength, time_milli, servonum);
+      break;
 
       default:
       break;

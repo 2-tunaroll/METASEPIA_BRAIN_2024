@@ -25,25 +25,25 @@
           
           <v-card>
             <v-container>
-              <p>surge</p>
+              <p>surge : {{Math.round(surge * 100) / 100}}</p>
               <v-progress-linear 
                 model-value="100"
               ></v-progress-linear>
             </v-container>
             <v-container>
-              <p>sway</p>
+              <p>sway : {{Math.round(sway * 100) / 100}}</p>
               <v-progress-linear 
                 model-value="100"
               ></v-progress-linear>
             </v-container>
             <v-container>
-              <p>pitch</p>
+              <p>pitch : {{ Math.round(pitch * 100) / 100 }}</p>
               <v-progress-linear 
                 model-value="100"
               ></v-progress-linear>
             </v-container>
             <v-container>
-              <p>yaw</p>
+              <p>yaw : {{ Math.round(yaw * 100) / 100 }}</p>
               <v-progress-linear 
                 model-value="100"
               ></v-progress-linear>

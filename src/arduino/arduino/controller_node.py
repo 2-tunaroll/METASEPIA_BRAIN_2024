@@ -14,9 +14,9 @@ class controller_node(Node):
     def joy_callback(self, msg):
         out = CMD()
         out.surge   = msg.axes[1]    
-        out.sway    = msg.axes[0]   
+        out.sway    = -msg.axes[0]   
         out.pitch   = msg.axes[4]   
-        out.yaw     = msg.axes[3]    
+        out.yaw     = -msg.axes[3]    
         self.publisher.publish(out)
 
 

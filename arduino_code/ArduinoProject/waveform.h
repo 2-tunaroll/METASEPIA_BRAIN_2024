@@ -10,10 +10,10 @@
 
 namespace waveform 
 {
-    float calc_angle_sinwave(float amplitude, float wavelength, unsigned long time, int servonum);
-    float calc_angle_flatwave(float amplitude, float wavelength, unsigned long time);
-    float calc_angle_standingwave(float amplitude, float wavelength, unsigned long time, int servonum);
-    float calc_angle_sinandflat(float amplitude, float wavelength, unsigned long time, int servonum);
+    float calc_angle_sinwave(float amplitude, float wavelength, float time, int servonum);
+    float calc_angle_flatwave(float amplitude, float wavelength, float time);
+    float calc_angle_standingwave(float amplitude, float wavelength, float time, int servonum);
+    float calc_angle_sinandflat(float amplitude, float wavelength, float time, int servonum);
 }
 
 #endif //WAVEFORM_H
