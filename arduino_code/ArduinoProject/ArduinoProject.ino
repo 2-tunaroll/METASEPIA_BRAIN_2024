@@ -63,6 +63,9 @@ byte voltage_high;
 // uint8_t send_voltage = 0;
 float amp = 0;
 
+float surge_ratio;
+float sway_ratio;
+
 void loop() {
   currentMillis = millis();
 
@@ -86,8 +89,11 @@ void loop() {
   }
 
   if (currentMillis - startMillis >= period) {
+    // amp = 50;
     // update positions
+    // drive_fins(surge, sway, pitch, yaw, amp);
 
+    // Surge OR sway - rudimentry
     amp = 50;
     if (abs(surge) > abs(sway))
     {
@@ -106,7 +112,7 @@ void loop() {
     }
 
     // increment time for waveform
-    time_milli += 10;
+    time_milli += 5;
     startMillis = currentMillis;
   }
 }

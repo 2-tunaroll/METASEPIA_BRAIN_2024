@@ -14,23 +14,11 @@
         <v-col>
           <v-card>
             <v-container>
-              <p>Voltage</p>
-              <v-slider
-                readonly
-                v-model="voltage"
-                max="12.6"
-                min="9.8"
-                step="0.1"
-                track-color="grey"
-              >
-              </v-slider>
-            </v-container>
-
-            <v-container>
-              <p>Charge (%)</p>
+              <p>Voltage : {{ Math.round(voltage * 100) / 100 }}</p>
+              <p>Charge  : {{ Math.floor(charge) }}%</p>
               <v-progress-linear 
+                v-model="charge"
                 color="primary"
-                model-value="50"
               ></v-progress-linear>
             </v-container>
           </v-card>
