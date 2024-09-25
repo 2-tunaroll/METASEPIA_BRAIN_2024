@@ -15,9 +15,15 @@
           <v-card>
             <v-container>
               <p>Voltage</p>
-              <v-progress-linear 
-                model-value="50"
-              ></v-progress-linear>
+              <v-slider
+                readonly
+                v-model="voltage"
+                max="12.6"
+                min="9.8"
+                step="0.1"
+                track-color="grey"
+              >
+              </v-slider>
             </v-container>
 
             <v-container>
