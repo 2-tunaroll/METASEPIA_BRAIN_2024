@@ -135,13 +135,25 @@ time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, 
   servo::set_positions(amp, 240, time.port, SINWAVE, P);
   servo::set_positions(amp, 240, time.starboard, SINWAVE, S);
 
-  // calculate incrementors (for now just max)
-  float time_inc_P = MAX_TIME_INC;
-  float time_inc_S = MAX_TIME_INC;
+  // create time increments
+  // float time_inc_P = 0;
+  // float time_inc_S = 0;
+
+  // calculate time increments
+  float time_inc_P = surge*MAX_TIME_INC;
+  float time_inc_S = surge*MAX_TIME_INC;
+
+  if (yaw > 0){
+    time_inc_P += yaw*MAX_TIME_INC;
+    time_inc_S -= yaw*MAX_TIME_INC;
+  } else if ( yaw < 0){
+    time_inc_P -= yaw*MAX_TIME_INC;
+    time_inc_S += yaw*MAX_TIME_INC;
+  }
 
   // clamp both incrementors to within max and min
-  //time_inc_P = clamp(time_inc_P);
-  //time_inc_S = clamp(time_inc_S);
+  time_inc_P = clamp(time_inc_P);
+  time_inc_S = clamp(time_inc_S);
 
   // increment both times 
   time.port += time_inc_P;

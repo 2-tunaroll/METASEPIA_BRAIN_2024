@@ -32,6 +32,8 @@
 
 unsigned long startMillis;
 unsigned long currentMillis;
+unsigned long timerstartMillis = 0;
+
 const unsigned long period = 25;
 int analogVoltagePin = A0;
 
@@ -61,6 +63,11 @@ int8_t surge = 0;
 int8_t sway = 0;
 int8_t pitch = 0;
 int8_t yaw = 0;
+
+float surge_prop = 0;
+float sway_prop = 0;
+float pitch_prop = 0;
+float yaw_prop = 0;
 
 int voltage = 0;
 byte voltage_low;
@@ -119,10 +126,22 @@ void loop() {
 
 
     // ------------------ NEW CODE ------------------------------
+    // converting to proportions (-1 to 1)
+    surge_prop = (float)surge/128.0;
+    sway_prop = (float)sway/128.0;
+    pitch_prop = (float)pitch/128.0;
+    yaw_prop = (float)yaw/128.0;
+
     amp = 50;
-    if (surge > 0){
-      time_milli = servo::drive_fins(surge, sway, pitch, yaw, amp, time_milli);
-    }
+    if (surge || sway || pitch || yaw){
+      time_milli = servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, amp, time_milli);
+    } else if (timerstartMillis == 0){
+        timerstartMillis = millis();
+    } else if ((currentMillis - timerstartMillis) > 3000){
+      time_milli.port = 0;
+      time_milli.starboard = 0;
+      timerstartMillis = 0;
+    } 
 
     startMillis = currentMillis;
   }
