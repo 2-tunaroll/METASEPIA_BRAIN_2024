@@ -134,10 +134,17 @@ void loop() {
 
     amp = 50;
     if (surge || sway || pitch || yaw){
+      // if there is any input, drive the motors and reset no input timer
       time_milli = servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, amp, time_milli);
+      timerstartMillis = 0;
+
+      // if there is no input and the timer is 0, start the timer
     } else if (timerstartMillis == 0){
         timerstartMillis = millis();
+
+      // if there is no input and the timer is over 3 seconds, set neutrals and reset timer
     } else if ((currentMillis - timerstartMillis) > 3000){
+      servo::set_neutrals(B);
       time_milli.port = 0;
       time_milli.starboard = 0;
       timerstartMillis = 0;
