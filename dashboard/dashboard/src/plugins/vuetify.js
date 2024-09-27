@@ -1,7 +1,9 @@
-import Vue from 'vue';
-import Vuetify from 'vuetify/lib/framework';
+import Vue from 'vue'
+import Vuetify from 'vuetify'
+import 'vuetify/dist/vuetify.min.css'
 
-Vue.use(Vuetify); 
+Vue.use(Vuetify)
+
 
 const darkTheme = {
     dark: true,
@@ -11,19 +13,14 @@ const darkTheme = {
         secondary: '#0A8DFF'
     }
 }
-  
+
 export default new Vuetify({
-    dark: true,
-    icons: {
-        iconfont: 'md'
-    },
-    theme : {
-        themes : {
-            dark : {
-                background: '#272727',
-                primary: '#FF7C0A',
-                secondary: '#0A8DFF'
-            }
+    theme: {
+        defaultTheme: 'darkTheme',
+        themes: {
+            darkTheme
         }
     }
-});
+})
+
+  

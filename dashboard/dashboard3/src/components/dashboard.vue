@@ -1,44 +1,83 @@
 <template>
     <v-container>    
-      <v-row no-gutters>
+      <v-row no-gutters justify="space between">
         <v-col>
-          <img v-bind:src="'data:image/jpeg;base64,' + imageBytes1"
-          width="700"
-          cover
-          />
+            <v-container>
+                <img v-bind:src="'data:image/jpeg;base64,' + imageBytes1"
+                cover 
+                style="border-radius: 2%;"
+                />
+            </v-container>
         </v-col> 
-        <v-col>
+        <v-col justify="center">
           <v-row no-gutters>
-            <v-card
-              width = "400"
-              height = "150"
-            >
-              <pre>
-                Voltage : {{ Math.round(average_voltage * 100) / 100 }}
-                Charge  : {{ Math.floor(average_charge) }}%
-              </pre>
-              <v-progress-linear 
-                v-model="average_charge"
-                color="primary"
-              ></v-progress-linear>
-            </v-card>
+            <v-container>
+                <v-card
+                >
+                    <template v-slot:text>
+                        <pre>
+voltage : {{ Math.round(average_voltage * 100) / 100 }}
+charge  : {{ Math.floor(average_charge) }}%
+                        </pre>
+                        <v-progress-linear 
+                            v-model="average_charge"
+                            color="primary"
+                            rounded="pill"
+                        ></v-progress-linear>
+                    </template>
+                </v-card>
+            </v-container>
+            
           </v-row>
           <v-row no-gutters>
-            <v-card
-              width = "400"
-            >
-              <pre>
-                surge   : {{Math.round(surge * 100) / 100}} 
-                sway    : {{Math.round(sway * 100) / 100}}
-                pitch   : {{ Math.round(pitch * 100) / 100 }}
-                yaw     : {{ Math.round(yaw * 100) / 100 }}
-              </pre>
-            </v-card>
+            <v-container>
+                <v-card
+                >
+                    <template v-slot:text>
+                        <pre>
+surge   : {{Math.round(surge * 100) / 100}} 
+sway    : {{Math.round(sway * 100) / 100}}
+pitch   : {{ Math.round(pitch * 100) / 100 }}
+yaw     : {{ Math.round(yaw * 100) / 100 }}
+                        </pre>
+                        <v-row justify="end">
+                            <div style="padding-right: 30px; padding-left: 30px; padding-bottom: 30px; padding-top: 30px">
+                                <Joystick
+                                :size="75"
+                                base-color="#494949"
+                                stick-color="#FF7C0A"
+                                :throttle="75"
+                                @move="move"
+                                />
+                            </div>
+                            <div style="padding-right: 30px; padding-left: 30px; padding-bottom: 30px; padding-top: 30px">
+                                <Joystick
+                                :size="75"
+                                base-color="#494949"
+                                stick-color="#FF7C0A"
+                                :throttle="75"
+                                @move="move"
+                                />
+                            </div> 
+                        </v-row>
+                    </template>
+                </v-card>
+            </v-container>
           </v-row>
         </v-col>
       </v-row>  
   </v-container>
 </template>
+
+<script setup>
+    import Joystick from 'vue-joystick-component'
+    const start = () => console.log('start')
+    const stop = () => console.log('stop')
+    const move = ({ x, y, direction, distance }) => {
+        x = surge;
+        console.log('move', { x, y, direction, distance });
+    }
+</script>
 
 <script>
 import ROSLIB from "roslib"

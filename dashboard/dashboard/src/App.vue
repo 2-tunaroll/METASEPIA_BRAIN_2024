@@ -1,8 +1,10 @@
 <template>
-  <v-app class="darkTheme">
-    <v-content>
-      <router-view/>
-    </v-content>
+  <v-app>
+    <v-main>
+      <h1>
+        TEST
+      </h1>
+    </v-main>
   </v-app>
 </template>
 
