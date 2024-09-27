@@ -60,7 +60,7 @@ def generate_launch_description():
 
 
     return LaunchDescription([
-        # arduino_node,
+        arduino_node,
         joy_node,
         camera_node,
         rosbridge_node,
