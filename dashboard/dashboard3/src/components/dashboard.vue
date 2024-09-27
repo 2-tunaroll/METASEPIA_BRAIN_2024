@@ -6,6 +6,7 @@
                 <img v-bind:src="'data:image/jpeg;base64,' + imageBytes1"
                 cover 
                 style="border-radius: 2%;"
+                width="650"
                 />
             </v-container>
         </v-col> 
