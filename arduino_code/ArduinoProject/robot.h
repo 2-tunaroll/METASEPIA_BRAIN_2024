@@ -9,15 +9,16 @@
 #define ROBOT_H
 
 // servomotor constants
-const int SERVOMIN  = 102; // This is the 'minimum' pulse length count (out of 4096)
-const int SERVOMAX  = 512;// This is the 'maximum' pulse length count (out of 4096)
-#define USMIN  600 // This i`s the rounded 'minimum' microsecond length based on the minimum pulse of 150
-#define USMAX  2400 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
+const int SERVOMIN  = 110; // This is the 'minimum' pulse length count (out of 4096)
+const int SERVOMAX  = 450;// This is the 'maximum' pulse length count (out of 4096)
+
+#define USMIN  500 // This i`s the rounded 'minimum' microsecond length based on the minimum pulse of 150
+#define USMAX  2500 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
 // neutral point for each servomotor (estimated at 300 each, refine later)
-const int NEUTRALS_PORT[5] = { 300, 300, 300, 300, 300};
-const int NEUTRALS_STARBOARD[5] = { 300, 300, 300, 300, 300};
+const int NEUTRALS_PORT[5] = { 0, 0, 0, -5 , 10};
+const int NEUTRALS_STARBOARD[5] = { 0, 0, 0, 0, 0};
 
 // Design constants
 #define NUM_SERVOS 5
@@ -26,6 +27,7 @@ const int NEUTRALS_STARBOARD[5] = { 300, 300, 300, 300, 300};
 
 // Programming constants
 #define MAX_TIME_INC 7
+#define MAX_ANGLE_DELTA 2
 
 // Coding constants
 enum Wavetypes {SINWAVE, FLATWAVE, STANDINGWAVE, SINANDFLAT};

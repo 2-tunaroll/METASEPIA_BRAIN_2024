@@ -2,7 +2,7 @@
     <v-container>    
       <v-row no-gutters justify="space between">
         <v-col>
-            <v-container>
+            <v-container >
                 <img v-bind:src="'data:image/jpeg;base64,' + imageBytes1"
                 cover 
                 style="border-radius: 2%;"
@@ -47,8 +47,9 @@ yaw     : {{ Math.round(yaw * 100) / 100 }}
                                 :size="75"
                                 base-color="#494949"
                                 stick-color="#FF7C0A"
-                                :throttle="75"
-                                @move="move"
+                                :throttle="50"
+                                :externalX=sway
+                                :externalY=surge
                                 />
                             </div>
                             <div style="padding-right: 30px; padding-left: 30px; padding-bottom: 30px; padding-top: 30px">
@@ -56,8 +57,9 @@ yaw     : {{ Math.round(yaw * 100) / 100 }}
                                 :size="75"
                                 base-color="#494949"
                                 stick-color="#FF7C0A"
-                                :throttle="75"
-                                @move="move"
+                                :throttle="50"
+                                :externalX=yaw
+                                :externalY=pitch
                                 />
                             </div> 
                         </v-row>
@@ -71,13 +73,7 @@ yaw     : {{ Math.round(yaw * 100) / 100 }}
 </template>
 
 <script setup>
-    import Joystick from 'vue-joystick-component'
-    const start = () => console.log('start')
-    const stop = () => console.log('stop')
-    const move = ({ x, y, direction, distance }) => {
-        x = surge;
-        console.log('move', { x, y, direction, distance });
-    }
+    import Joystick from './joysticks_bep.vue'
 </script>
 
 <script>
@@ -113,15 +109,17 @@ export default {
     return {
       imageBytes1: "",
       voltage: 0,
-      voltage_window: [],
-      average_voltage: 0,
       charge: 0,
-      charge_window: [],
-      average_charge: 0,
       surge: 0,
       sway: 0,
       pitch: 0,
-      yaw: 0
+      yaw: 0,
+      
+      voltage_window: [],
+      charge_window: [],
+      
+      average_voltage: 0,
+      average_charge: 0,
     };
   },
   mounted() {
@@ -161,32 +159,43 @@ export default {
         self.sway = message.sway;
         self.pitch = message.pitch;
         self.yaw = message.yaw;
+
+        self.add_surge(message.surge);
+        self.add_sway(message.sway);
       });
 
     },
-    add_voltage(volatge) {
-      if (this.voltage_window.length >= 50) {
-        this.voltage_window.shift();
+    add_data(key, data, maxWindowSize) {
+      // Ensure the window array exists for the given key
+      if (!this[key + '_window']) {
+        this[key + '_window'] = [];
       }
-      this.voltage_window.push(volatge);
-      this.calculate_average_voltage();
+      
+      // If the window exceeds the max size, remove the oldest entry
+      if (this[key + '_window'].length >= maxWindowSize) {
+        this[key + '_window'].shift();
+      }
+
+      // Push the new data into the window
+      this[key + '_window'].push(data);
+      
+      // Calculate the average for the window
+      this.calculate_average(key);
     },
-    calculate_average_voltage() {
-      if (this.voltage_window.length > 0) {
-        this.average_voltage = this.voltage_window.reduce((partialSum, a) => partialSum + a, 0) / this.voltage_window.length;
+    
+    // General method to calculate the average for any key's window
+    calculate_average(key) {
+      const window = this[key + '_window'];
+      
+      if (window && window.length > 0) {
+        this['average_' + key] = window.reduce((partialSum, a) => partialSum + a, 0) / window.length;
       }
+    },
+    add_voltage(voltage) {
+      this.add_data('voltage', voltage, 50);
     },
     add_charge(charge) {
-      if (this.charge_window.length >= 100) {
-        this.charge_window.shift();
-      }
-      this.charge_window.push(charge);
-      this.calculate_average_charge();
-    },
-    calculate_average_charge() {
-      if (this.charge_window.length > 0) {
-        this.average_charge = this.charge_window.reduce((partialSum, a) => partialSum + a, 0) / this.charge_window.length;
-      }
+      this.add_data('charge', charge, 100);
     }
   }
 }

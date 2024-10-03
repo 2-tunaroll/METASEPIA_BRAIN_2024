@@ -15,6 +15,8 @@
 
 // called this way, it uses the default address 0x40
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+float last_port_angle[5] = {0,0,0,0,0};
+float last_starboard_angle[5] = {0,0,0,0,0};
 
 // functino to initialise the servomotors, set required servomotor values and drive them to a neutral position
 void servo::init()
@@ -38,9 +40,10 @@ void servo::init()
    */
   pwm.setOscillatorFrequency(27000000);
   pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
-
-  // drive to a neutral position
-  servo::set_neutrals(B);
+  for (int i = 0; i < 30; i++){
+    set_positions(0,240,0,SINWAVE,B);
+    delay(100);
+  }
 }
 
 // set servo positions based off angle required
@@ -79,65 +82,43 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
       break;
     }
     
-    switch(side)
-    {
-      case P:
+    
+    // PORT side angle set
+    if (side == B || side == P) {
+      angle += NEUTRALS_PORT[servonum];
+
+      if (angle > last_port_angle[servonum] + MAX_ANGLE_DELTA) {
+        angle = last_port_angle[servonum] + MAX_ANGLE_DELTA;
+      } else if (angle < last_port_angle[servonum] - MAX_ANGLE_DELTA) {
+        angle = last_port_angle[servonum] - MAX_ANGLE_DELTA;
+      }
       pulse_port = map(angle, -90, 90, SERVOMIN, SERVOMAX); 
       pwm.setPWM(servonum, 0, pulse_port);
-      break;
-
-      case S:
-      pulse_starboard = map(-angle, -90, 90, SERVOMIN, SERVOMAX);
-      pwm.setPWM(servonum + NUM_SERVOS, 0, pulse_starboard);
-      break;
-
-      case B:
-      pulse_port = map(angle, -90, 90, SERVOMIN, SERVOMAX); 
-      pulse_starboard = map(-angle, -90, 90, SERVOMIN, SERVOMAX);
-      pwm.setPWM(servonum, 0, pulse_port);
-      pwm.setPWM(servonum + NUM_SERVOS, 0, pulse_starboard);
-      break;
+      last_port_angle[servonum] = angle;
     }
 
-    //Serial.println(pulse);
-  }
-}
+    // STARBOARD side angle set
+    if (side == B || side == S) {
+      angle += NEUTRALS_STARBOARD[servonum];
 
-// set all servomotors to a neutral position
-void servo::set_neutrals(int side)
-{
-  uint8_t servonum;
-
-  //loop through all servos and set to neutral point
-  for(servonum = 0; servonum < NUM_SERVOS; servonum++)
-  {
-    switch (side)
-    {
-      case P:
-      pwm.setPWM(servonum,0,NEUTRALS_PORT[servonum]);
-      break;
-
-      case S:
-      pwm.setPWM(servonum + NUM_SERVOS,0,NEUTRALS_STARBOARD[servonum]);
-      break;
-
-      case B:
-      pwm.setPWM(servonum,0,NEUTRALS_PORT[servonum]);
-      pwm.setPWM(servonum + NUM_SERVOS,0,NEUTRALS_STARBOARD[servonum]);
-      break;
+      if (angle > last_starboard_angle[servonum] + MAX_ANGLE_DELTA) {
+        angle = last_starboard_angle[servonum] + MAX_ANGLE_DELTA;
+      } else if (angle < last_starboard_angle[servonum] - MAX_ANGLE_DELTA) {
+        angle = last_starboard_angle[servonum] - MAX_ANGLE_DELTA;
+      }
+      pulse_starboard = map(-angle, -90, 90, SERVOMIN, SERVOMAX);
+      pwm.setPWM(servonum + NUM_SERVOS, 0, pulse_starboard);
+      last_starboard_angle[servonum] = angle;
     }
   }
 }
+
 
 time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time){
   
   // set positions
-  servo::set_positions(amp, 240, time.port, SINWAVE, P);
-  servo::set_positions(amp, 240, time.starboard, SINWAVE, S);
-
-  // create time increments
-  // float time_inc_P = 0;
-  // float time_inc_S = 0;
+  servo::set_positions(amp, 480, time.port, SINWAVE, P);
+  servo::set_positions(amp, 480, time.starboard, SINWAVE, S);
 
   // calculate time increments
   float time_inc_P = surge*MAX_TIME_INC;
