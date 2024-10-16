@@ -18,7 +18,7 @@ const int SERVOMAX  = 450;// This is the 'maximum' pulse length count (out of 40
 
 // neutral point for each servomotor (estimated at 300 each, refine later)
 const int NEUTRALS_PORT[5] = { 0, 0, 0, -5 , 10};
-const int NEUTRALS_STARBOARD[5] = { 0, 0, 0, 0, 0};
+const int NEUTRALS_STARBOARD[5] = { -7, 0, -5, -5, 5};
 
 // Design constants
 #define NUM_SERVOS 5

@@ -1,5 +1,17 @@
 <template>
-    <v-container>    
+    <v-container fill-height justify="center"> 
+      <v-row no-gutters justify="space between">
+        <v-container>
+          <v-card>
+            <template v-slot:title>
+              <span style="color: #FF7C0A">METASEPIA</span> 
+            </template>
+            <template v-slot:subtitle>
+              <span style="font-style: italic; color: lavender"> the flamboyant</span>
+            </template>
+          </v-card>
+        </v-container>
+      </v-row>   
       <v-row no-gutters justify="space between">
         <v-col>
             <v-container >
@@ -68,6 +80,47 @@ yaw     : {{ Math.round(yaw * 100) / 100 }}
             </v-container>
           </v-row>
         </v-col>
+      </v-row>
+      <v-row no-gutters justify="space between">
+        <v-col no-gutters>
+          <v-container>
+            <v-card>
+              <template v-slot:text>
+                <v-radio-group v-model="mode" mandatory>
+                  <v-radio   label="Manual Control"    value="manual"></v-radio>
+                  <v-radio   label="Object Tracking"   value="object-track"></v-radio>
+                  <v-radio   label="SLAM"              value="slam"></v-radio>
+                </v-radio-group>
+
+                <v-switch
+                  color="#FF7C0A"
+                  label="Turbo Mode"
+                ></v-switch>
+              </template>
+            </v-card>
+          </v-container>
+        </v-col>
+        <v-col no-gutters>
+          <v-container>
+            <v-card
+            height="250"
+            >
+              <!-- <img v-bind:src="'data:image/jpeg;base64,' + imageBytes2"
+                cover 
+                style="border-radius: 2%;"
+                width="650"
+                height="250"
+              /> -->
+              <template v-slot:title>
+                  <v-spacer/>
+                  <div style="font-style: italic;">
+                    Coming Soon ...
+                  </div>
+                  <v-spacer/>
+              </template>
+            </v-card>
+          </v-container>
+        </v-col>
       </v-row>  
   </v-container>
 </template>
@@ -108,6 +161,7 @@ export default {
   data: function () {
     return {
       imageBytes1: "",
+      imageBytes2: "",
       voltage: 0,
       charge: 0,
       surge: 0,
@@ -120,10 +174,13 @@ export default {
       
       average_voltage: 0,
       average_charge: 0,
+
+      mode: ""
     };
   },
   mounted() {
     this.init();
+    document.title = "Metasepia Dashboard";
   },
   methods: {
     init: function () {

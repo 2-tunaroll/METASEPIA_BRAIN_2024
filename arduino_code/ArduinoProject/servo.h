@@ -22,6 +22,7 @@ namespace servo
   void set_neutrals(int side);
   time_milli_t drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time_milli);
   float clamp(float time_inc);
+  float set_rudder(float pitch);
 }
 
 

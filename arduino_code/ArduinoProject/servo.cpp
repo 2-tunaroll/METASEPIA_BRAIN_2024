@@ -116,32 +116,85 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
 
 time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time){
   
-  // set positions
-  servo::set_positions(amp, 480, time.port, SINWAVE, P);
-  servo::set_positions(amp, 480, time.starboard, SINWAVE, S);
+  int waveform;
 
-  // calculate time increments
-  float time_inc_P = surge*MAX_TIME_INC;
-  float time_inc_S = surge*MAX_TIME_INC;
+  float amp_P = amp;
+  float amp_S = amp;
 
-  if (yaw > 0){
-    time_inc_P += yaw*MAX_TIME_INC;
-    time_inc_S -= yaw*MAX_TIME_INC;
-  } else if ( yaw < 0){
-    time_inc_P -= yaw*MAX_TIME_INC;
-    time_inc_S += yaw*MAX_TIME_INC;
+  // if almost only sway (5% margin), only do sway
+  if (abs(surge) <= 0.05 && abs(yaw) <= 0.05){
+
+    // is positive sway (towards starboard)
+    if (sway > 0){
+      float time_inc_P = sway*MAX_TIME_INC; // calculate port time increment
+      time_inc_P = clamp(time_inc_P);       // clamp time increment
+      time.port += time_inc_P;              // increment port time
+      time.starboard = 0;                   // set starboard time to zero
+
+      // if negative sway (towards port)
+    } else if (sway < 0){                    
+      float time_inc_S = sway*MAX_TIME_INC; // calculate starboard time increment
+      time_inc_S = clamp(time_inc_S);       // clamp time increment 
+      time.starboard += time_inc_S;         // increment starboard time
+      time.port = 0;                        // set port time to zero
+    }
+
+    // update type of waveform to drive fins with
+    waveform = FLATWAVE;
+    //waveform = STANDINGWAVE;
+
+  // else if surge/yaw are the largest do a combination of all
+  } else {
+
+    // calculate time increments for both sides due to surge
+    float time_inc_P = surge*MAX_TIME_INC;
+    float time_inc_S = surge*MAX_TIME_INC;
+
+    // increase/decrease time increments on both sides due to yaw 
+    if (yaw > 0){                       // positive yaw (top down clockwise)
+      time_inc_P += yaw*MAX_TIME_INC;
+      time_inc_S -= yaw*MAX_TIME_INC; 
+    } else if ( yaw < 0){               // negative yaw (top down anti-clockwise)
+      time_inc_P -= yaw*MAX_TIME_INC;
+      time_inc_S += yaw*MAX_TIME_INC;
+    }
+
+    // sway amplitude mode
+    if (sway > 0){
+      amp_S = amp*(1-sway);
+    } else if (sway < 0){
+      amp_P = amp*(1-sway);
+    }
+
+    // sin and flat mode
+    if (abs(sway) > 0.05){
+      
+    }
+
+    // clamp both incrementors to within max and min
+    time_inc_P = clamp(time_inc_P);
+    time_inc_S = clamp(time_inc_S);
+
+    // increment both times 
+    time.port += time_inc_P;
+    time.starboard += time_inc_S;  
+
+    waveform = SINWAVE;
+
   }
 
-  // clamp both incrementors to within max and min
-  time_inc_P = clamp(time_inc_P);
-  time_inc_S = clamp(time_inc_S);
-
-  // increment both times 
-  time.port += time_inc_P;
-  time.starboard += time_inc_S;  
+  // set positions
+  servo::set_positions(amp_S, 480, time.port, waveform, P);
+  servo::set_positions(amp_P, 480, time.starboard, waveform, S);
 
   // return tuple of times
   return time;
+}
+
+float servo::set_rudder(float pitch){
+  // rudder last two spokes (mode 2)
+
+  // rudder only last spoke (mode 1)
 }
 
 float servo::clamp(float time_inc){
