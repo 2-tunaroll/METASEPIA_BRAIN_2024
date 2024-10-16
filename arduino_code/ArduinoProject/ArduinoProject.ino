@@ -37,8 +37,7 @@ int analogVoltagePin = A0;
 
 input_command inputs;
 
-//time_milli_t time_milli;
-float time_milli;
+time_milli_t time_milli;
 
 // setup function - baud rate, serial printing, initialising
 void setup() {
@@ -48,10 +47,8 @@ void setup() {
   startMillis = millis();
   servo::init();
 
-  time_milli = 0;
-
-  //time_milli.port = 0;
-  //time_milli.starboard = 0;
+  time_milli.port = 0;
+  time_milli.starboard = 0;
 
   delay(2000);
 }
@@ -107,50 +104,50 @@ void loop() {
     // update positions
     // drive_fins(surge, sway, pitch, yaw, amp);
     // Surge OR sway - rudimentry
-    amp = 50;
-    if (abs(surge) > abs(sway)) {
-      if (surge > 0){
-        servo::set_positions(amp, 480, time_milli, SINWAVE, B);
-      } else {
-        servo::set_positions(amp, 480, time_milli, FLATWAVE, B);
-      }
+    // amp = 50;
+    // if (abs(surge) > abs(sway)) {
+    //   if (surge > 0){
+    //     servo::set_positions(amp, 480, time_milli, SINWAVE, B);
+    //   } else {
+    //     servo::set_positions(amp, 480, time_milli, FLATWAVE, B);
+    //   }
       
-    } 
-    else if (sway > 0) {
-        amp = 70;
-        servo::set_positions(amp, 480, time_milli, STANDINGWAVE, P);
-      }
-    else if (sway < 0) {
-      servo::set_positions(amp, 480, time_milli, SINANDFLAT, P);
-    } 
-    else {
-      // reset time if no input
-      time_milli = 0;
-    }
-    // increment time for waveform
-    time_milli += 7;
-    startMillis = currentMillis;
+    // } 
+    // else if (sway > 0) {
+    //     amp = 70;
+    //     servo::set_positions(amp, 480, time_milli, STANDINGWAVE, P);
+    //   }
+    // else if (sway < 0) {
+    //   servo::set_positions(amp, 480, time_milli, SINANDFLAT, P);
+    // } 
+    // else {
+    //   // reset time if no input
+    //   time_milli = 0;
+    // }
+    // // increment time for waveform
+    // time_milli += 7;
+    // startMillis = currentMillis;
 
 
     // ------------------ NEW CODE ------------------------------
     // converting to proportions (-1 to 1)
-    // surge_prop = (float)surge/128.0;
-    // sway_prop = (float)sway/128.0;
-    // pitch_prop = (float)pitch/128.0;
-    // yaw_prop = (float)yaw/128.0;
+    surge_prop = (float)surge/128.0;
+    sway_prop = (float)sway/128.0;
+    pitch_prop = (float)pitch/128.0;
+    yaw_prop = (float)yaw/128.0;
 
-    // amp = 70;
-    // if (surge || sway || pitch || yaw){
-    //   // if there is any input, drive the motors and reset no input timer
-    //   time_milli = servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, amp, time_milli);
+    amp = 70;
+    if (surge || sway || pitch || yaw){
+      // if there is any input, drive the motors and reset no input timer
+      time_milli = servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, amp, time_milli);
 
-    //   // if there is no input and the timer is 0, start the timer
-    // } else {
-    //   servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, 0, time_milli);
-    //   time_milli.port = 0;
-    //   time_milli.starboard = 0; 
-    // }
+      // if there is no input, drive a wave with amplitude 0
+    } else {
+      servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, 0, time_milli);
+      time_milli.port = 0;
+      time_milli.starboard = 0; 
+    }
     
-    // startMillis = currentMillis;
+    startMillis = currentMillis;
   }
 }

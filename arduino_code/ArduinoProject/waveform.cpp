@@ -62,7 +62,7 @@ float waveform::calc_angle_sinandflat(float amplitude, float wavelength, float t
     float sinheight = amplitude * sin( 2*M_PI/wavelength * (time + FIN_LENGTH_MM*servonum/(NUM_SERVOS-1)));
     
     // sample the waveform to get height of wave at a calculated point based on servonum 
-    float flatheight = 70 * sin( 2*M_PI/960 * time);
+    float flatheight = amplitude * sin( 2*M_PI/960 * time);
 
     float height = (sinheight + flatheight)/2;
 
