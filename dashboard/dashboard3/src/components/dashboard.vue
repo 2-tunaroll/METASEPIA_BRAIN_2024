@@ -53,7 +53,8 @@ sway    : {{Math.round(sway * 100) / 100}}
 pitch   : {{ Math.round(pitch * 100) / 100 }}
 yaw     : {{ Math.round(yaw * 100) / 100 }}
 
-amplitude   : {{amplitude}}
+amplitude         : {{amplitude}}
+speed_multiplier  : {{Math.round(speed_multiplier * 100) / 100}}
                       </pre>
                       <v-row justify="end">
                           <div style="padding-right: 30px; padding-left: 30px; padding-bottom: 30px; padding-top: 30px">
@@ -171,6 +172,7 @@ data: function () {
     pitch: 0,
     yaw: 0,
     amplitude: 0,
+    speed_multiplier: 0,
     
     voltage_window: [],
     charge_window: [],
@@ -214,12 +216,13 @@ methods: {
     });
 
     cmd_sub.subscribe((message) => {
-      console.log('Received message on ' + cmd_sub.name + ': ' + message.surge + ': ' + message.sway + ': ' + message.pitch + ': ' + message.yaw + ': ' + message.amplitude);
+      console.log('Received message on ' + cmd_sub.name + ': ' + message.surge + ': ' + message.sway + ': ' + message.pitch + ': ' + message.yaw + ': ' + message.amplitude + ': ' + message.speed_multiplier);
       self.surge = message.surge;
       self.sway = message.sway;
       self.pitch = message.pitch;
       self.yaw = message.yaw;
       self.amplitude = message.amplitude;
+      self.speed_multiplier = message.speed_multiplier;
 
       self.add_surge(message.surge);
       self.add_sway(message.sway);

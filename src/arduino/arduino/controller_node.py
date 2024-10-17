@@ -7,15 +7,33 @@ from custom_msgs.msg import CMD
 MAX_AMPLITUDE = 70.0
 MIN_AMPLITUDE = 0.0
 
+MAX_SPEED = 1.0
+MIN_SPEED = 0.0
+
 class controller_node(Node):
     def __init__(self):
         super().__init__('arduino_node')
         self.subscription = self.create_subscription(Joy, 'joy', self.joy_callback, 10)
         self.publisher = self.create_publisher(CMD, 'CMD', 10)
         self.amplitude = 40.0
+        self.speed_multiplier = 1.0
         
          
     def joy_callback(self, msg):
+
+        #increase speed_multiplier
+        if (msg.buttons[1]):
+            self.speed_multiplier += 0.1
+
+        #decrease speed_multiplier
+        if (msg.buttons[3]):
+            self.speed_multiplier -= 0.1
+
+        if (self.speed_multiplier > MAX_SPEED): 
+            self.speed_multiplier = MAX_SPEED
+        
+        if (self.speed_multiplier < MIN_SPEED):
+            self.speed_multiplier = MIN_SPEED
 
         # increase amplitude
         if (msg.buttons[2]):
@@ -33,10 +51,10 @@ class controller_node(Node):
 
         out = CMD()
         
-        out.surge       = msg.axes[1]    
-        out.sway        = -msg.axes[0]   
-        out.pitch       = msg.axes[4]   
-        out.yaw         = -msg.axes[3]
+        out.surge       = msg.axes[1]       * self.speed_multiplier
+        out.sway        = -msg.axes[0]      * self.speed_multiplier
+        out.pitch       = msg.axes[4]       * self.speed_multiplier
+        out.yaw         = -msg.axes[3]      * self.speed_multiplier
 
         if not (msg.axes[2] < -0.9 and msg.axes[5] < -0.9):
             out.surge = 0.0
@@ -45,6 +63,8 @@ class controller_node(Node):
             out.yaw = 0.0
 
         out.amplitude   = self.amplitude
+        out.speed_multiplier = self.speed_multiplier
+        
         self.publisher.publish(out)
 
 

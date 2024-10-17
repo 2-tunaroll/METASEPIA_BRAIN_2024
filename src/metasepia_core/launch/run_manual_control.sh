@@ -42,7 +42,7 @@ cleanup() {
 }
 
 
-
+source install/setup.sh
 # Set up trap to catch Ctrl+C (SIGINT) and termination signal (SIGTERM)
 trap cleanup SIGINT SIGTERM
 
