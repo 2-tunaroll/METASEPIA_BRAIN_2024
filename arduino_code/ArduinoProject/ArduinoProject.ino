@@ -63,6 +63,8 @@ int8_t sway = 0;
 int8_t pitch = 0;
 int8_t yaw = 0;
 
+int8_t amplitude = 0;
+
 float surge_prop = 0;
 float sway_prop = 0;
 float pitch_prop = 0;
@@ -72,7 +74,6 @@ int voltage = 0;
 byte voltage_low;
 byte voltage_high;
 // uint8_t send_voltage = 0;
-float amp = 0;
 
 float surge_ratio;
 float sway_ratio;
@@ -84,12 +85,15 @@ void loop() {
   voltage_high  = voltage >> 8;     // Extract the high byte (the upper 2 bits)
   voltage_low   = voltage & 0xFF;   // Extract the low byte (the lower 8 bits)
   
-  if (Serial.available() >= 5) {
+  if (Serial.available() >= 6) {
     if (Serial.read() == 1) {
       surge 	= Serial.read() - 128;
       sway 	  = Serial.read() - 128;
       pitch 	= Serial.read() - 128;
       yaw 	  = Serial.read() - 128;
+
+      amplitude     = Serial.read();
+      // change amplitude and maxtime
         
       Serial.write(0b1);
       Serial.write(voltage_high);
@@ -105,10 +109,11 @@ void loop() {
     pitch_prop = (float)pitch/128.0;
     yaw_prop = (float)yaw/128.0;
 
-    amp = 70;
+    if (amplitude > MAX_AMPLITUDE) amplitude = MAX_AMPLITUDE;
+    
     if (surge || sway || pitch || yaw){
       // if there is any input, drive the motors and reset no input timer
-      time_milli = servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, amp, time_milli);
+      time_milli = servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, (float)amplitude, time_milli);
 
       // if there is no input, drive a wave with amplitude 0
     } else {

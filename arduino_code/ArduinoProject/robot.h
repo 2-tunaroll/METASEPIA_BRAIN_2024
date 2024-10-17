@@ -17,17 +17,18 @@ const int SERVOMAX  = 450;// This is the 'maximum' pulse length count (out of 40
 #define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
 
 // neutral point for each servomotor (estimated at 300 each, refine later)
-const int NEUTRALS_PORT[5] = { 0, 0, 0, -5 , 10};
-const int NEUTRALS_STARBOARD[5] = { 0, 0, 0, 0, 0};
+const int NEUTRALS_PORT[5] = { -3, -16, -9, 0 , 0};
+const int NEUTRALS_STARBOARD[5] = { 3, -10, 0, 0, 5};
 
 // Design constants
 #define NUM_SERVOS 5
 #define SPOKE_LENGTH_MM 140
 #define FIN_LENGTH_MM 240
 
-// Programming constants
+// Safety Thresholds
 #define MAX_TIME_INC 7
 #define MAX_ANGLE_DELTA 2
+#define MAX_AMPLITUDE 70
 
 // Coding constants
 enum Wavetypes {SINWAVE, FLATWAVE, STANDINGWAVE, SINANDFLAT};

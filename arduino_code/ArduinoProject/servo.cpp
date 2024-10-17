@@ -15,14 +15,14 @@
 
 // called this way, it uses the default address 0x40
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
-float last_port_angle[5] = {0,0,0,0,0};
-float last_starboard_angle[5] = {0,0,0,0,0};
+float last_port_angle[5];
+float last_starboard_angle[5];
 
 // functino to initialise the servomotors, set required servomotor values and drive them to a neutral position
 void servo::init()
 {
   pwm.begin();
-  /*
+  /*s
    * In theory the internal oscillator (clock) is 25MHz but it really isn't
    * that precise. You can 'calibrate' this by tweaking this number until
    * you get the PWM update frequency you're expecting!
@@ -40,6 +40,12 @@ void servo::init()
    */
   pwm.setOscillatorFrequency(27000000);
   pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
+
+  for (int i = 0; i < 5; i++) {
+    last_port_angle[i] = 0.0;
+    last_starboard_angle[i] = 0.0;
+  }
+
   for (int i = 0; i < 30; i++){
     set_positions(0,240,0,SINWAVE,B);
     delay(100);
@@ -116,21 +122,18 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
 
 time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time){
   
-  // set positions
+  // set positions based off time from previous 
   servo::set_positions(amp, 480, time.port, SINWAVE, P);
   servo::set_positions(amp, 480, time.starboard, SINWAVE, S);
 
-  // calculate time increments
-  float time_inc_P = surge*MAX_TIME_INC;
-  float time_inc_S = surge*MAX_TIME_INC;
+  // calculate time increments (metasepia forwards, fins backwards)
+  float time_inc_P = -surge*MAX_TIME_INC;
+  float time_inc_S = -surge*MAX_TIME_INC;
 
-  if (yaw > 0){
-    time_inc_P += yaw*MAX_TIME_INC;
-    time_inc_S -= yaw*MAX_TIME_INC;
-  } else if ( yaw < 0){
-    time_inc_P -= yaw*MAX_TIME_INC;
-    time_inc_S += yaw*MAX_TIME_INC;
-  }
+  // yaw is signed (works it self out)
+  time_inc_P += yaw*MAX_TIME_INC;
+  time_inc_S -= yaw*MAX_TIME_INC;
+  
 
   // clamp both incrementors to within max and min
   time_inc_P = clamp(time_inc_P);
