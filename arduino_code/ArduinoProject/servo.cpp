@@ -15,14 +15,14 @@
 
 // called this way, it uses the default address 0x40
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
-float last_port_angle[5] = {0,0,0,0,0};
-float last_starboard_angle[5] = {0,0,0,0,0};
+float last_port_angle[5];
+float last_starboard_angle[5];
 
 // functino to initialise the servomotors, set required servomotor values and drive them to a neutral position
 void servo::init()
 {
   pwm.begin();
-  /*
+  /*s
    * In theory the internal oscillator (clock) is 25MHz but it really isn't
    * that precise. You can 'calibrate' this by tweaking this number until
    * you get the PWM update frequency you're expecting!
@@ -40,14 +40,20 @@ void servo::init()
    */
   pwm.setOscillatorFrequency(27000000);
   pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
+
+  for (int i = 0; i < 5; i++) {
+    last_port_angle[i] = 0.0;
+    last_starboard_angle[i] = 0.0;
+  }
+
   for (int i = 0; i < 30; i++){
-    set_positions(0,240,0,SINWAVE,B);
+    set_positions(0,240,0,SINWAVE,B,0);
     delay(100);
   }
 }
 
 // set servo positions based off angle required
-void servo::set_positions(float amplitude, float wavelength, float time_milli, int wavetype, int side)
+void servo::set_positions(float amplitude, float wavelength, float time_milli, int wavetype, int side, float elevator)
 {
   float angle; 
   float pulse_port;
@@ -74,6 +80,10 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
       angle = waveform::calc_angle_standingwave(amplitude, wavelength, time_milli, servonum);
       break;
 
+      case STANDINGWAVESHIFTED:
+      angle = waveform::calc_angle_standingwaveshifted(amplitude, wavelength, time_milli, servonum);
+      break;
+
       case SINANDFLAT:
       angle = waveform::calc_angle_sinandflat(amplitude, wavelength, time_milli, servonum);
       break;
@@ -82,16 +92,38 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
       break;
     }
     
+    // elevator 
+    if (servonum == 4){
+      angle -= elevator*MAX_ANGLE;
+    }
     
     // PORT side angle set
     if (side == B || side == P) {
       angle += NEUTRALS_PORT[servonum];
 
+      // neighbour clamping
+      if (servonum != 0){
+        if (angle > last_port_angle[servonum - 1] + MAX_ANGLE_NEIGHBOUR){
+          angle = last_port_angle[servonum - 1] + MAX_ANGLE_NEIGHBOUR;
+        } else if (angle < last_port_angle[servonum - 1] - MAX_ANGLE_NEIGHBOUR){
+          angle = last_port_angle[servonum - 1] - MAX_ANGLE_NEIGHBOUR;
+        }
+      }
+
+      // angle clamping
+      if (angle < -MAX_ANGLE){
+        angle = -MAX_ANGLE;
+      } else if (angle > MAX_ANGLE){
+        angle = MAX_ANGLE;
+      }
+
+      // delta clamping
       if (angle > last_port_angle[servonum] + MAX_ANGLE_DELTA) {
         angle = last_port_angle[servonum] + MAX_ANGLE_DELTA;
       } else if (angle < last_port_angle[servonum] - MAX_ANGLE_DELTA) {
         angle = last_port_angle[servonum] - MAX_ANGLE_DELTA;
       }
+
       pulse_port = map(angle, -90, 90, SERVOMIN, SERVOMAX); 
       pwm.setPWM(servonum, 0, pulse_port);
       last_port_angle[servonum] = angle;
@@ -99,13 +131,31 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
 
     // STARBOARD side angle set
     if (side == B || side == S) {
-      angle += NEUTRALS_STARBOARD[servonum];
+      angle += NEUTRALS_STARBOARD[servonum]; 
 
+      // neighbour clamping
+      if (servonum != 0){
+        if (angle > last_starboard_angle[servonum - 1] + MAX_ANGLE_NEIGHBOUR){
+          angle = last_starboard_angle[servonum - 1] + MAX_ANGLE_NEIGHBOUR;
+        } else if (angle < last_starboard_angle[servonum - 1] - MAX_ANGLE_NEIGHBOUR){
+          angle = last_starboard_angle[servonum - 1] - MAX_ANGLE_NEIGHBOUR;
+        }
+      }
+
+      // angle clamping
+      if (angle < -MAX_ANGLE){
+        angle = -MAX_ANGLE;
+      } else if (angle > MAX_ANGLE){
+        angle = MAX_ANGLE;
+      }
+
+      // delta clamping
       if (angle > last_starboard_angle[servonum] + MAX_ANGLE_DELTA) {
         angle = last_starboard_angle[servonum] + MAX_ANGLE_DELTA;
       } else if (angle < last_starboard_angle[servonum] - MAX_ANGLE_DELTA) {
         angle = last_starboard_angle[servonum] - MAX_ANGLE_DELTA;
       }
+
       pulse_starboard = map(-angle, -90, 90, SERVOMIN, SERVOMAX);
       pwm.setPWM(servonum + NUM_SERVOS, 0, pulse_starboard);
       last_starboard_angle[servonum] = angle;
@@ -115,21 +165,36 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
 
 
 time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time){
-  
-  // set positions
-  servo::set_positions(amp, 480, time.port, SINWAVE, P);
-  servo::set_positions(amp, 480, time.starboard, SINWAVE, S);
 
-  // calculate time increments
-  float time_inc_P = surge*MAX_TIME_INC;
-  float time_inc_S = surge*MAX_TIME_INC;
+  float time_inc_P = 0;
+  float time_inc_S = 0;
+  int wavetype = SINWAVE;
 
-  if (yaw > 0){
+  if (abs(sway) > abs(surge)){
+
+    wavetype = FLATWAVE;
+    if (yaw > 0.2) wavetype = STANDINGWAVESHIFTED;
+    if (yaw < -0.2) wavetype = STANDINGWAVE;
+
+    if (sway > 0){
+      time_inc_P += sway*MAX_TIME_INC;
+      time.starboard = 0;
+    } else {
+      time_inc_S = sway*MAX_TIME_INC;
+      time.port = 0;
+    }
+  } else {
+
+    wavetype = SINWAVE;
+
+    // calculate time increments (metasepia forwards, fins backwards)
+    time_inc_P -= surge*MAX_TIME_INC;
+    time_inc_S -= surge*MAX_TIME_INC;
+
+    // yaw is signed (works it self out)
     time_inc_P += yaw*MAX_TIME_INC;
     time_inc_S -= yaw*MAX_TIME_INC;
-  } else if ( yaw < 0){
-    time_inc_P -= yaw*MAX_TIME_INC;
-    time_inc_S += yaw*MAX_TIME_INC;
+
   }
 
   // clamp both incrementors to within max and min
@@ -139,6 +204,10 @@ time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, 
   // increment both times 
   time.port += time_inc_P;
   time.starboard += time_inc_S;  
+
+  // set positions based off time from previous 
+  servo::set_positions(amp, 480, time.port, wavetype, P, pitch);
+  servo::set_positions(amp, 480, time.starboard, wavetype, S, pitch);
 
   // return tuple of times
   return time;

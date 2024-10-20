@@ -36,10 +36,10 @@ class arduino_node(Node):
     
     def voltage_to_battery_charge(self, voltage):
         if voltage < 9.8:
-            return -1
+            return -1.0
         
-        if voltage == 12.6:
-            return 100
+        if voltage >= 12.6:
+            return 100.0
         
         i = bisect.bisect_right(self.vtg, voltage) - 1
         
@@ -55,7 +55,8 @@ class arduino_node(Node):
             float_to_uint8(msg.surge),    
             float_to_uint8(msg.sway),    
             float_to_uint8(msg.pitch),    
-            float_to_uint8(msg.yaw)     
+            float_to_uint8(msg.yaw),
+            np.uint8(msg.amplitude)
         )
         self.serial_port.write(message)
 

@@ -54,6 +54,22 @@ float waveform::calc_angle_standingwave(float amplitude, float wavelength, float
     return angle;
 }
 
+// calc_angle_standingwave2 function - takes sinusoidal parameters and servonum, and calculates the angle required for a given servomotor to achieve waveform
+float waveform::calc_angle_standingwaveshifted(float amplitude, float wavelength, float time, int servonum)
+{  
+
+    // sample the waveform to get height of wave at a calculated point based on servonum 
+    float height1 = amplitude * sin( (2*M_PI/wavelength) * (time + FIN_LENGTH_MM*servonum/(NUM_SERVOS-1) - FIN_LENGTH_MM/2));
+    float height2 = amplitude * sin( (2*M_PI/wavelength) * (-time + FIN_LENGTH_MM*servonum/(NUM_SERVOS-1) - FIN_LENGTH_MM/2));
+
+    float height = (height1 + height2)/2;
+
+    // calculate angle required of servomotor to achieve given height (basic trig)
+    float angle = 360/(2*M_PI)*asin( (float) height / SPOKE_LENGTH_MM);
+
+    return angle;
+}
+
 // calc_angle_sinandflat function - takes sinusoidal parameters and servonum, and calculates the angle required for a given servomotor to achieve waveform
 // TEMPORARY FUNCTION for testing compound functions
 float waveform::calc_angle_sinandflat(float amplitude, float wavelength, float time, int servonum)
