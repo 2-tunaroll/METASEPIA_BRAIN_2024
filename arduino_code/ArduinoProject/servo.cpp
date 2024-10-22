@@ -132,6 +132,7 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
     // STARBOARD side angle set
     if (side == B || side == S) {
       angle += NEUTRALS_STARBOARD[servonum]; 
+      if (wavetype == SINWAVE) angle *= -1;
 
       // neighbour clamping
       if (servonum != 0){
@@ -192,8 +193,8 @@ time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, 
     time_inc_S -= surge*MAX_TIME_INC;
 
     // yaw is signed (works it self out)
-    time_inc_P += yaw*MAX_TIME_INC;
-    time_inc_S -= yaw*MAX_TIME_INC;
+    time_inc_P -= yaw*MAX_TIME_INC;
+    time_inc_S += yaw*MAX_TIME_INC;
 
   }
 
