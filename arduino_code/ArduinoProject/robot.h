@@ -35,6 +35,7 @@ const int NEUTRALS_STARBOARD[5] = { 3, -10, -16, 0, 5};
 // Coding constants
 enum Wavetypes {SINWAVE, FLATWAVE, STANDINGWAVE, SINANDFLAT, STANDINGWAVESHIFTED};
 enum sides {P,S,B};
+enum mode {STANDBY, AQUATIC, LAND, TURBO};
 
 // direction controls
 struct input_command {

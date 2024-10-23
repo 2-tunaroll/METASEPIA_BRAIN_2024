@@ -8,7 +8,8 @@ import serial
 import numpy as np
 import bisect
 
-MESSAGE_TYPE = 1
+CHANGE_MODE = 0
+MOVE = 1
 
 def float_to_uint8(value, min_value=-1.0, max_value=1.0):
     # Clamp the value to the min and max range
@@ -28,6 +29,7 @@ class arduino_node(Node):
                                 baudrate = 115200,
                                 timeout = 1
                             )
+        self.mode = 0
         self.pct = [  0,   5,  10,  15,  20,  25,  30,  35,  40,  45,  50,  55,  60,
         65,  70,  75,  80,  85,  90,  95, 100]
         self.vtg = [ 9.82, 10.83, 11.06, 11.12, 11.18, 11.24, 11.3 , 11.36, 11.39,
@@ -49,15 +51,27 @@ class arduino_node(Node):
         
     
     def cmd_callback(self, msg):
+        if (self.mode != msg.mode):
+            self.mode = msg.mode
+            message = (
+                CHANGE_MODE,        # message change mode
+                np.uint8(msg.mode),
+                np.uint8(0),
+                np.uint8(0),
+                np.uint8(0),
+                np.uint8(0),
+            )
         # Send instruction over serial
-        message = (
-            MESSAGE_TYPE,                   # type = instruction
-            float_to_uint8(msg.surge),    
-            float_to_uint8(msg.sway),    
-            float_to_uint8(msg.pitch),    
-            float_to_uint8(msg.yaw),
-            np.uint8(msg.amplitude)
-        )
+        else: 
+            message = (
+                MOVE,                   # type = instruction
+                float_to_uint8(msg.surge),    
+                float_to_uint8(msg.sway),    
+                float_to_uint8(msg.pitch),    
+                float_to_uint8(msg.yaw),
+                np.uint8(msg.amplitude)
+            )
+
         self.serial_port.write(message)
 
         # Recieve response and update voltage topic
