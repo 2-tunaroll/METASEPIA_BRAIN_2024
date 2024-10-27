@@ -56,7 +56,7 @@ LAUNCH_PID=$!
 sleep 20
 
 # Set the parameter using ROS2 command
-if ros2 param set /camera/camera .camera.color.image_raw.compressed.jpeg_quality 70; then
+if ros2 param set /camera/camera .camera.color.image_raw.compressed.jpeg_quality 30; then
     echo "Setting JPEG quality successful"
 else
     echo "Failed to set JPEG quality parameter"

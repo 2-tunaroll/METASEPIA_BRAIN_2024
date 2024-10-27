@@ -1,53 +1,36 @@
 <template>
-  <v-container fill-height justify="center"> 
-    <v-row no-gutters justify="space between">
-      <v-container>
-        <v-card>
-          <template v-slot:title>
-            <span style="color: #FF7C0A">METASEPIA</span> 
-          </template>
-          <template v-slot:subtitle>
-            <span style="font-style: italic; color: lavender"> the flamboyant</span>
-          </template>
-        </v-card>
+  <v-container fluid class="fill-height" style="width:90vw;" >
+    <v-col cols="12" md="7">
+      <v-container style="height:100%; overflow:hidden">
+          <img v-bind:src="'data:image/jpeg;base64,' + imageBytes1"
+          style="border-radius: 2%; height: 100%; width: 100%; object-fit:cover"
+          />
       </v-container>
-    </v-row>   
-    <v-row no-gutters justify="space between">
-      <v-col>
-          <v-container >
-              <img v-bind:src="'data:image/jpeg;base64,' + imageBytes1"
-              cover 
-              style="border-radius: 2%;"
-              width="650"
-              />
-          </v-container>
-      </v-col> 
-      <v-col justify="center">
-        <v-row no-gutters>
-          <v-container>
-              <v-card
-              >
-                  <template v-slot:text>
-                      <pre>
+    </v-col>   
+    <v-col cols="12" md="5">
+        <v-container >
+          <v-card>
+            <template v-slot:text>
+              <pre>
 voltage : {{ Math.round(average_voltage * 100) / 100 }}
 charge  : {{ Math.floor(average_charge) }}%
-                      </pre>
-                      <v-progress-linear 
-                          v-model="average_charge"
-                          color="primary"
-                          rounded="pill"
-                      ></v-progress-linear>
-                  </template>
-              </v-card>
-          </v-container>
-          
-        </v-row>
-        <v-row no-gutters>
-          <v-container>
-              <v-card
-              >
-                  <template v-slot:text>
-                      <pre>
+              </pre>
+              <v-progress-linear 
+                  v-model="average_charge"
+                  color="primary"
+                  rounded="pill"
+              ></v-progress-linear>
+            </template>
+          </v-card>
+        </v-container>
+      
+      <v-col cols="12" md="5">
+        
+      </v-col>
+        <v-container>
+          <v-card>
+            <template v-slot:text>
+              <pre>
 surge   : {{Math.round(surge * 100) / 100}} 
 sway    : {{Math.round(sway * 100) / 100}}
 pitch   : {{ Math.round(pitch * 100) / 100 }}
@@ -55,77 +38,43 @@ yaw     : {{ Math.round(yaw * 100) / 100 }}
 
 amplitude         : {{amplitude}}
 speed_multiplier  : {{Math.round(speed_multiplier * 100) / 100}}
-                      </pre>
-                      <v-row justify="end">
-                          <div style="padding-right: 30px; padding-left: 30px; padding-bottom: 30px; padding-top: 30px">
-                              <Joystick
-                              :size="75"
-                              base-color="#494949"
-                              stick-color="#FF7C0A"
-                              :throttle="50"
-                              :externalX=sway
-                              :externalY=surge
-                              />
-                          </div>
-                          <div style="padding-right: 30px; padding-left: 30px; padding-bottom: 30px; padding-top: 30px">
-                              <Joystick
-                              :size="75"
-                              base-color="#494949"
-                              stick-color="#FF7C0A"
-                              :throttle="50"
-                              :externalX=yaw
-                              :externalY=pitch
-                              />
-                          </div> 
-                      </v-row>
-                  </template>
-              </v-card>
-          </v-container>
-        </v-row>
-      </v-col>
-    </v-row>
-    <v-row no-gutters justify="space between">
-      <v-col no-gutters>
-        <v-container>
-          <v-card>
-            <template v-slot:text>
-              <v-radio-group v-model="mode" mandatory>
-                <v-radio   label="Manual Control"    value="manual"></v-radio>
-                <v-radio   label="Object Tracking"   value="object-track"></v-radio>
-                <v-radio   label="SLAM"              value="slam"></v-radio>
-              </v-radio-group>
-
-              <v-switch
-                color="#FF7C0A"
-                label="Turbo Mode"
-              ></v-switch>
-            </template>
-          </v-card>
-        </v-container>
-      </v-col>
-      <v-col no-gutters>
-        <v-container>
-          <v-card
-          height="250"
-          >
-            <!-- <img v-bind:src="'data:image/jpeg;base64,' + imageBytes2"
-              cover 
-              style="border-radius: 2%;"
-              width="650"
-              height="250"
-            /> -->
-            <template v-slot:title>
-                <v-spacer/>
-                <div style="font-style: italic;">
-                  Coming Soon ...
+              </pre>
+              <v-row justify="end">
+                <div style="padding-right: 30px; padding-left: 30px; padding-bottom: 30px; padding-top: 30px">
+                  <Joystick
+                  :size="75"
+                  base-color="#494949"
+                  stick-color="#FF7C0A"
+                  :throttle="50"
+                  :externalX=sway
+                  :externalY=surge
+                  />
                 </div>
-                <v-spacer/>
+                <div style="padding-right: 30px; padding-left: 30px; padding-bottom: 30px; padding-top: 30px">
+                  <Joystick
+                  :size="75"
+                  base-color="#494949"
+                  stick-color="#FF7C0A"
+                  :throttle="50"
+                  :externalX=yaw
+                  :externalY=pitch
+                  />
+                </div> 
+              </v-row>
             </template>
           </v-card>
         </v-container>
-      </v-col>
-    </v-row>  
-</v-container>
+      <v-container>
+        <v-card>
+          <template v-slot:text>
+            <pre>
+mode : {{ mode }}
+            </pre>
+          </template>
+        </v-card>
+      </v-container>
+    </v-col>
+  </v-container>
 </template>
 
 <script setup>
@@ -136,7 +85,7 @@ speed_multiplier  : {{Math.round(speed_multiplier * 100) / 100}}
 import ROSLIB from "roslib"
 
 const ros = new ROSLIB.Ros({ 
-url: "ws://localhost:9090" 
+url: "ws://192.168.194.52:9090" 
 });
 
 const battery_sub = new ROSLIB.Topic({
@@ -167,10 +116,10 @@ data: function () {
     imageBytes2: "",
     voltage: 0,
     charge: 0,
-    surge: 0,
-    sway: 0,
-    pitch: 0,
-    yaw: 0,
+    surge: 0.0,
+    sway: 0.0,
+    pitch: 0.0,
+    yaw: 0.0,
     amplitude: 0,
     speed_multiplier: 0,
     
@@ -180,7 +129,8 @@ data: function () {
     average_voltage: 0,
     average_charge: 0,
 
-    mode: ""
+    mode: "",
+    dms: ""
   };
 },
 mounted() {
@@ -216,13 +166,23 @@ methods: {
     });
 
     cmd_sub.subscribe((message) => {
-      console.log('Received message on ' + cmd_sub.name + ': ' + message.surge + ': ' + message.sway + ': ' + message.pitch + ': ' + message.yaw + ': ' + message.amplitude + ': ' + message.speed_multiplier);
+      console.log('Received message on ' +  cmd_sub.name + ': ' + message.mode + ': ' + message.surge + ': ' + message.sway + ': ' + message.pitch + ': ' + message.yaw + ': ' + message.amplitude + ': ' + message.speed_multiplier);
       self.surge = message.surge;
       self.sway = message.sway;
       self.pitch = message.pitch;
       self.yaw = message.yaw;
       self.amplitude = message.amplitude;
       self.speed_multiplier = message.speed_multiplier;
+      
+      if (message.mode == 0) {
+        self.mode = "standby";
+      } else if (message.mode == 1) {
+        self.mode = "aquatic";
+      } else if (message.mode == 2) {
+        self.mode = "land";
+      } else {
+        self.mode = "off";
+      }
 
       self.add_surge(message.surge);
       self.add_sway(message.sway);
