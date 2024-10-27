@@ -79,7 +79,7 @@ float surge_ratio;
 float sway_ratio;
 
 int message_type = 0;
-mode mode = STANDBY;
+mode mode = 0;
 
 void loop() {
   currentMillis = millis();
@@ -88,41 +88,25 @@ void loop() {
   voltage_high  = voltage >> 8;     // Extract the high byte (the upper 2 bits)
   voltage_low   = voltage & 0xFF;   // Extract the low byte (the lower 8 bits)
   
-  if (Serial.available() >= 6) {
-    message_type = Serial.read();
-    switch (message_type){
-      case 0:
-        mode = Serial.read(); 
-        Serial.read();
-        Serial.read();
-        Serial.read();
-        Serial.read();
-        break;
+  if (Serial.available() >= 7) {
+    if (Serial.read() == 42) {
+      mode = Serial.read();
 
-      case 1: 
-        surge 	= Serial.read() - 128;
-        sway 	  = Serial.read() - 128;
-        pitch 	= Serial.read() - 128;
-        yaw 	  = Serial.read() - 128;
+      surge 	= Serial.read() - 128;
+      sway 	  = Serial.read() - 128;
+      pitch 	= Serial.read() - 128;
+      yaw 	  = Serial.read() - 128;
 
-        amplitude     = Serial.read();
-        // change amplitude and maxtime
+      amplitude     = Serial.read();
 
-      default:
-        mode = STANDBY;
+      Serial.write(0b1);
+      Serial.write(voltage_high);
+      Serial.write(voltage_low);
     }
-
-    Serial.write(0b1);
-    Serial.write(voltage_high);
-    Serial.write(voltage_low);
   }
 
   if (currentMillis - startMillis >= period) {
-    switch (mode) {
-      case STANDBY:
-        break;
-
-      case AQUATIC:
+    if (mode == AQUATIC || mode == LAND) {
         surge_prop = (float)surge/128.0;
         sway_prop = (float)sway/128.0;
         pitch_prop = (float)pitch/128.0;
@@ -132,25 +116,16 @@ void loop() {
         
         if (surge || sway || pitch || yaw){
           // if there is any input, drive the motors and reset no input timer
-          time_milli = servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, (float)amplitude, time_milli);
+          time_milli = servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, (float)amplitude, time_milli, mode);
 
           // if there is no input, drive a wave with amplitude 0
         } else {
-          servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, 0, time_milli);
+          servo::drive_fins(surge_prop, sway_prop, pitch_prop, yaw_prop, 0, time_milli, mode);
           time_milli.port = 0;
           time_milli.starboard = 0; 
-        }
-        break;
-
-      case LAND:
-        break;
-      
-      case TURBO:
-        break;
-
-      default:
-        break;
+        } 
     }
+
     startMillis = currentMillis;
   }
 }

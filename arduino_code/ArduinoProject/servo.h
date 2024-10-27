@@ -18,9 +18,9 @@ typedef struct {
 namespace servo 
 {
   void init();
-  void set_positions(float amplitude, float wavelength, float time_milli, int wavetype, int side, float elevator);
+  void set_positions(float amplitude, float wavelength, float time_milli, int wavetype, int side, float elevator, mode mode);
   void set_neutrals(int side);
-  time_milli_t drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time_milli);
+  time_milli_t drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time_milli, mode mode);
   float clamp(float time_inc);
 }
 

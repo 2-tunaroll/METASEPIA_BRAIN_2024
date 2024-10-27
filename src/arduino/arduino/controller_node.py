@@ -11,7 +11,7 @@ MIN_AMPLITUDE = 0.0
 MAX_SPEED = 1.0
 MIN_SPEED = 0.0
 
-MAX_MODE = 4
+MAX_MODE = 3
 
 AUTOREPEAT_DELAY = 0.2
 
@@ -36,19 +36,9 @@ class controller_node(Node):
     def joy_callback(self, msg):
         current_time = time.monotonic()
 
-        # handle mode change first and return early
-        if (msg.buttons[9]):
-            last_press = self.last_button_pressed_time.get(9, 0)
-            if current_time - last_press >= AUTOREPEAT_DELAY:
-                self.mode = (self.mode + 1) % MAX_MODE
-                self.publisher.publish(
-                    CMD(mode=self.mode)
-                )
-                self.last_button_pressed_time[9] = current_time
-                return
-
         for button_index, action in [(1, self.increase_speed), (3, self.decrease_speed),
-                                     (2, self.increase_amplitude), (0, self.decrease_amplitude)]:
+                                     (2, self.increase_amplitude), (0, self.decrease_amplitude),
+                                     (9, self.change_mode)]:
             if msg.buttons[button_index]:
                 last_press = self.last_button_pressed_time.get(button_index, 0)
                 if current_time - last_press >= AUTOREPEAT_DELAY:
@@ -84,6 +74,9 @@ class controller_node(Node):
     
     def decrease_amplitude(self):
         self.amplitude = clamp(self.amplitude - 5.0, MAX_AMPLITUDE, MIN_AMPLITUDE)
+    
+    def change_mode(self):
+        self.mode = (self.mode + 1) % MAX_MODE
 
 def main(args=None):
     rclpy.init(args=args)

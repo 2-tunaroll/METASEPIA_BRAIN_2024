@@ -47,13 +47,13 @@ void servo::init()
   }
 
   for (int i = 0; i < 30; i++){
-    set_positions(0,240,0,SINWAVE,B,0);
+    set_positions(0,240,0,SINWAVE,B,0, AQUATIC);
     delay(100);
   }
 }
 
 // set servo positions based off angle required
-void servo::set_positions(float amplitude, float wavelength, float time_milli, int wavetype, int side, float elevator)
+void servo::set_positions(float amplitude, float wavelength, float time_milli, int wavetype, int side, float elevator, mode mode)
 {
   float angle; 
   float pulse_port;
@@ -91,7 +91,7 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
       default:
       break;
     }
-    
+
     // elevator 
     if (servonum == 4){
       angle -= elevator*MAX_ANGLE;
@@ -100,6 +100,7 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
     // PORT side angle set
     if (side == B || side == P) {
       angle += NEUTRALS_PORT[servonum];
+      if (mode == LAND) angle += 50;
 
       // neighbour clamping
       if (servonum != 0){
@@ -132,6 +133,7 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
     // STARBOARD side angle set
     if (side == B || side == S) {
       angle += NEUTRALS_STARBOARD[servonum]; 
+      if (mode == LAND) angle += 50;
 
       // neighbour clamping
       if (servonum != 0){
@@ -164,7 +166,7 @@ void servo::set_positions(float amplitude, float wavelength, float time_milli, i
 }
 
 
-time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time){
+time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, float amp, time_milli_t time, mode mode){
 
   float time_inc_P = 0;
   float time_inc_S = 0;
@@ -206,8 +208,8 @@ time_milli_t servo::drive_fins(float surge, float sway, float pitch, float yaw, 
   time.starboard += time_inc_S;  
 
   // set positions based off time from previous 
-  servo::set_positions(amp, 480, time.port, wavetype, P, pitch);
-  servo::set_positions(amp, 480, time.starboard, wavetype, S, pitch);
+  servo::set_positions(amp, 480, time.port, wavetype, P, pitch, mode);
+  servo::set_positions(amp, 480, time.starboard, wavetype, S, pitch, mode);
 
   // return tuple of times
   return time;

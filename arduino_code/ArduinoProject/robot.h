@@ -18,7 +18,7 @@ const int SERVOMAX  = 450;// This is the 'maximum' pulse length count (out of 40
 
 // neutral point for each servomotor (estimated at 300 each, refine later)
 const int NEUTRALS_PORT[5] = { -3, -16, -9, 0 , 0};
-const int NEUTRALS_STARBOARD[5] = { 3, -10, -16, 0, 5};
+const int NEUTRALS_STARBOARD[5] = { -5, 0, -5, 0, 5};
 
 // Design constants
 #define NUM_SERVOS 5
@@ -30,7 +30,7 @@ const int NEUTRALS_STARBOARD[5] = { 3, -10, -16, 0, 5};
 #define MAX_ANGLE_DELTA 2
 #define MAX_AMPLITUDE 70
 #define MAX_ANGLE_NEIGHBOUR 30
-#define MAX_ANGLE 35 
+#define MAX_ANGLE 38
 
 // Coding constants
 enum Wavetypes {SINWAVE, FLATWAVE, STANDINGWAVE, SINANDFLAT, STANDINGWAVESHIFTED};

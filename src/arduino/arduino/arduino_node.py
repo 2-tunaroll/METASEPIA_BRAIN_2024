@@ -8,8 +8,7 @@ import serial
 import numpy as np
 import bisect
 
-CHANGE_MODE = 0
-MOVE = 1
+HEADER_VAL = 42
 
 def float_to_uint8(value, min_value=-1.0, max_value=1.0):
     # Clamp the value to the min and max range
@@ -51,26 +50,15 @@ class arduino_node(Node):
         
     
     def cmd_callback(self, msg):
-        if (self.mode != msg.mode):
-            self.mode = msg.mode
-            message = (
-                CHANGE_MODE,        # message change mode
-                np.uint8(msg.mode),
-                np.uint8(0),
-                np.uint8(0),
-                np.uint8(0),
-                np.uint8(0),
-            )
-        # Send instruction over serial
-        else: 
-            message = (
-                MOVE,                   # type = instruction
-                float_to_uint8(msg.surge),    
-                float_to_uint8(msg.sway),    
-                float_to_uint8(msg.pitch),    
-                float_to_uint8(msg.yaw),
-                np.uint8(msg.amplitude)
-            )
+        message = (
+            HEADER_VAL,
+            msg.mode,                   # type = instruction
+            float_to_uint8(msg.surge),    
+            float_to_uint8(msg.sway),    
+            float_to_uint8(msg.pitch),    
+            float_to_uint8(msg.yaw),
+            np.uint8(msg.amplitude)
+        )
 
         self.serial_port.write(message)
 
