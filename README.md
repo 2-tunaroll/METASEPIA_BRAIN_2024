@@ -6,7 +6,7 @@
 > ~ Mr. Cuttlefish
 
 ```
-contact Peppe Grasso at
+contact me at
 peppegrasso02@gmail.com 
 0468 301 705
 ```
